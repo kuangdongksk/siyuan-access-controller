@@ -1,17 +1,10 @@
 {
-  "name": "plugin-sample",
+  "name": "siyuan-access-controller",
   "author": "Vanessa",
   "url": "https://github.com/siyuan-note/plugin-sample",
   "version": "0.3.5",
   "minAppVersion": "3.0.12",
-  "backends": [
-    "windows",
-    "linux",
-    "darwin",
-    "ios",
-    "android",
-    "docker"
-  ],
+  "backends": ["windows", "linux", "darwin", "ios", "android", "docker"],
   "frontends": [
     "desktop",
     "mobile",
@@ -35,12 +28,7 @@
     "openCollective": "",
     "patreon": "",
     "github": "",
-    "custom": [
-      "https://ld246.com/sponsor"
-    ]
+    "custom": ["https://ld246.com/sponsor"]
   },
-  "keywords": [
-    "sample",
-    "示例"
-  ]
+  "keywords": ["sample", "示例"]
 }

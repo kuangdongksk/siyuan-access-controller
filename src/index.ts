@@ -1,26 +1,29 @@
 import {
-  Plugin,
-  showMessage,
   confirm,
-  Dialog,
-  Menu,
-  openTab,
-  adaptHotkey,
-  getFrontend,
-  getBackend,
-  IModel,
-  Setting,
-  fetchPost,
-  Protyle,
-  openWindow,
-  IOperation,
   Constants,
-  openMobileFileById,
-  lockScreen,
+  Dialog,
+  fetchPost,
+  getBackend,
+  getFrontend,
   ICard,
   ICardData,
+  IModel,
+  IOperation,
+  IProtyle,
+  lockScreen,
+  Menu,
+  openMobileFileById,
+  openTab,
+  openWindow,
+  Plugin,
+  Protyle,
+  Setting,
+  showMessage,
 } from "siyuan";
+import { 输出事件总线 } from "./constant/eventBus";
 import "./index.scss";
+import { Icon } from "./template/Icon";
+import { CustomContent, CustomContentMobile, IDockData } from "./template/dock";
 
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
@@ -31,6 +34,7 @@ export default class AccessControllerPlugin extends Plugin {
   private isMobile: boolean;
   private blockIconEventBindThis = this.blockIconEvent.bind(this);
 
+  //#region onLoad
   onload() {
     console.log("🚀 ~ AccessControllerPlugin ~ onload ~ onload:");
 
@@ -38,13 +42,9 @@ export default class AccessControllerPlugin extends Plugin {
 
     const frontEnd = getFrontend();
     this.isMobile = frontEnd === "mobile" || frontEnd === "browser-mobile";
+
     // 图标的制作参见帮助文档
-    this.addIcons(`<symbol id="iconFace" viewBox="0 0 32 32">
-<path d="M13.667 17.333c0 0.92-0.747 1.667-1.667 1.667s-1.667-0.747-1.667-1.667 0.747-1.667 1.667-1.667 1.667 0.747 1.667 1.667zM20 15.667c-0.92 0-1.667 0.747-1.667 1.667s0.747 1.667 1.667 1.667 1.667-0.747 1.667-1.667-0.747-1.667-1.667-1.667zM29.333 16c0 7.36-5.973 13.333-13.333 13.333s-13.333-5.973-13.333-13.333 5.973-13.333 13.333-13.333 13.333 5.973 13.333 13.333zM14.213 5.493c1.867 3.093 5.253 5.173 9.12 5.173 0.613 0 1.213-0.067 1.787-0.16-1.867-3.093-5.253-5.173-9.12-5.173-0.613 0-1.213 0.067-1.787 0.16zM5.893 12.627c2.28-1.293 4.040-3.4 4.88-5.92-2.28 1.293-4.040 3.4-4.88 5.92zM26.667 16c0-1.040-0.16-2.040-0.44-2.987-0.933 0.2-1.893 0.32-2.893 0.32-4.173 0-7.893-1.92-10.347-4.92-1.4 3.413-4.187 6.093-7.653 7.4 0.013 0.053 0 0.12 0 0.187 0 5.88 4.787 10.667 10.667 10.667s10.667-4.787 10.667-10.667z"></path>
-</symbol>
-<symbol id="iconSaving" viewBox="0 0 32 32">
-<path d="M20 13.333c0-0.733 0.6-1.333 1.333-1.333s1.333 0.6 1.333 1.333c0 0.733-0.6 1.333-1.333 1.333s-1.333-0.6-1.333-1.333zM10.667 12h6.667v-2.667h-6.667v2.667zM29.333 10v9.293l-3.76 1.253-2.24 7.453h-7.333v-2.667h-2.667v2.667h-7.333c0 0-3.333-11.28-3.333-15.333s3.28-7.333 7.333-7.333h6.667c1.213-1.613 3.147-2.667 5.333-2.667 1.107 0 2 0.893 2 2 0 0.28-0.053 0.533-0.16 0.773-0.187 0.453-0.347 0.973-0.427 1.533l3.027 3.027h2.893zM26.667 12.667h-1.333l-4.667-4.667c0-0.867 0.12-1.72 0.347-2.547-1.293 0.333-2.347 1.293-2.787 2.547h-8.227c-2.573 0-4.667 2.093-4.667 4.667 0 2.507 1.627 8.867 2.68 12.667h2.653v-2.667h8v2.667h2.68l2.067-6.867 3.253-1.093v-4.707z"></path>
-</symbol>`);
+    this.addIcons(Icon);
 
     const topBarElement = this.addTopBar({
       icon: "iconFace",
@@ -70,11 +70,13 @@ export default class AccessControllerPlugin extends Plugin {
     });
 
     const statusIconTemp = document.createElement("template");
-    statusIconTemp.innerHTML = `<div class="toolbar__item ariaLabel" aria-label="Remove plugin-sample Data">
-    <svg>
+    statusIconTemp.innerHTML = `
+    <div class="toolbar__item ariaLabel" aria-label="Remove plugin-sample Data">
+      <svg>
         <use xlink:href="#iconTrashcan"></use>
-    </svg>
-</div>`;
+      </svg>
+    </div>
+    `;
     statusIconTemp.content.firstElementChild.addEventListener("click", () => {
       confirm(
         "⚠️",
@@ -105,6 +107,7 @@ export default class AccessControllerPlugin extends Plugin {
       },
     });
 
+    //#region 添加快捷键
     this.addCommand({
       langKey: "showDialog",
       hotkey: "⇧⌘O",
@@ -120,55 +123,42 @@ export default class AccessControllerPlugin extends Plugin {
         console.log("🚀", this.getOpenedTab());
       },
     });
+    //#endregion
+
+    //#region 添加dock
+    const CustomDockTitle = "自定义Dock标题";
+    const dockData: IDockData = { text: "这是我的自定义dock" };
     this.addDock({
       config: {
         position: "LeftBottom",
         size: { width: 200, height: 0 },
         icon: "iconSaving",
-        title: "Custom Dock",
+        title: "自定义 Dock",
         hotkey: "⌥⌘W",
       },
-      data: {
-        text: "This is my custom dock",
-      },
+      data: dockData,
       type: DOCK_TYPE,
       resize() {
-        console.log("🚀", DOCK_TYPE + " resize");
+        console.log("🚀 ", DOCK_TYPE + " resize");
       },
       update() {
         console.log("🚀", DOCK_TYPE + " update");
       },
       init: (dock) => {
         if (this.isMobile) {
-          dock.element.innerHTML = `<div class="toolbar toolbar--border toolbar--dark">
-    <svg class="toolbar__icon"><use xlink:href="#iconEmoji"></use></svg>
-        <div class="toolbar__text">Custom Dock</div>
-    </div>
-    <div class="fn__flex-1 plugin-sample__custom-dock">
-        ${dock.data.text}
-    </div>
-</div>`;
+          dock.element.innerHTML = CustomContentMobile(
+            CustomDockTitle,
+            dockData
+          );
         } else {
-          dock.element.innerHTML = `<div class="fn__flex-1 fn__flex-column">
-    <div class="block__icons">
-        <div class="block__logo">
-            <svg class="block__logoicon"><use xlink:href="#iconEmoji"></use></svg>Custom Dock
-        </div>
-        <span class="fn__flex-1 fn__space"></span>
-        <span data-type="min" class="block__icon b3-tooltips b3-tooltips__sw" aria-label="Min ${adaptHotkey(
-          "⌘W"
-        )}"><svg><use xlink:href="#iconMin"></use></svg></span>
-    </div>
-    <div class="fn__flex-1 plugin-sample__custom-dock">
-        ${dock.data.text}
-    </div>
-</div>`;
+          dock.element.innerHTML = CustomContent(CustomDockTitle, dockData);
         }
       },
       destroy() {
-        console.log("🚀", "destroy dock:", DOCK_TYPE);
+        console.log("🚀", "销毁Dock:", DOCK_TYPE);
       },
     });
+    //#endregion
 
     const textareaElement = document.createElement("textarea");
     this.setting = new Setting({
@@ -247,18 +237,20 @@ export default class AccessControllerPlugin extends Plugin {
 
     console.log("🚀", this.i18n.helloPlugin);
   }
+  //#endregion
 
+  //#region onLayoutReady
   onLayoutReady() {
     this.loadData(STORAGE_NAME);
-    console.log(
-      "🚀 onLayoutReady",
-      `frontend: ${getFrontend()}; backend: ${getBackend()}`
-    );
+    console.log("🚀 布局完成", `前端: ${getFrontend()}; 后端: ${getBackend()}`);
   }
+  //#endregion
 
+  //#region onunload
   onunload() {
     console.log("🚀", this.i18n.byePlugin);
   }
+  //#endregion
 
   uninstall() {
     console.log("🚀", "uninstall");
@@ -277,7 +269,7 @@ export default class AccessControllerPlugin extends Plugin {
     return options;
   }
 
-  // 自定义设置;
+  //#region 自定义设置
   openSetting() {
     const dialog = new Dialog({
       title: this.name,
@@ -303,6 +295,7 @@ export default class AccessControllerPlugin extends Plugin {
       dialog.destroy();
     });
   }
+  //#endregion
 
   private eventBusPaste(event: any) {
     // 如果需异步处理请调用 preventDefault， 否则会进行默认处理
@@ -313,17 +306,25 @@ export default class AccessControllerPlugin extends Plugin {
     });
   }
 
-  private eventBusLog({ detail }: any) {
-    console.log("🚀 eventBusLog", detail);
-    if (detail?.cmd === "unmount") {
-      console.log("🚀 eventBusLog unmount", detail);
-    }
-  }
+  private blockIconEvent(event: {
+    detail: {
+      blockElements: HTMLElement[];
+      menu: {
+        menus: {
+          accelerator: string; // 快捷键
+          click: () => Promise<void>;
+          iconHTML: string;
+          label: string;
+        }[];
+      };
+      protyle: IProtyle;
+    };
+  }) {
+    const detail = event.detail;
 
-  private blockIconEvent({ detail }: any) {
     detail.menu.addItem({
       iconHTML: "",
-      label: this.i18n.removeSpace,
+      label: this.i18n.removeSpace, // 移除空格
       click: () => {
         const doOperations: IOperation[] = [];
         detail.blockElements.forEach((item: HTMLElement) => {
@@ -373,35 +374,38 @@ export default class AccessControllerPlugin extends Plugin {
     });
   }
 
+  //#endregion 添加目录
   private addMenu(rect?: DOMRect) {
-    const menu = new Menu("topBarSample", () => {
-      console.log("🚀", this.i18n.byeMenu);
-    });
+    const 菜单关闭回调 = () => {
+      console.log("🚀 菜单关闭回调");
+    };
+    const menu = new Menu("topBar示范", 菜单关闭回调);
     menu.addItem({
       icon: "iconInfo",
-      label: "Dialog(open help first)",
+      label: "对话(open help first)",
       accelerator: this.commands[0].customHotkey,
       click: () => {
+        console.log("🚀 点击了对话");
         this.showDialog();
       },
     });
     if (!this.isMobile) {
       menu.addItem({
         icon: "iconFace",
-        label: "Open Custom Tab",
+        label: "打开自定义 Tab",
         click: () => {
           const tab = openTab({
             app: this.app,
             custom: {
               icon: "iconFace",
-              title: "Custom Tab",
+              title: "自定义 Tab",
               data: {
-                text: "This is my custom tab",
+                text: "这是我的自定义 tab",
               },
               id: this.name + TAB_TYPE,
             },
           });
-          console.log("🚀", tab);
+          console.log("🚀 点击了打开自定义 tab ", tab);
         },
       });
       menu.addItem({
@@ -480,7 +484,7 @@ export default class AccessControllerPlugin extends Plugin {
     } else {
       menu.addItem({
         icon: "iconFile",
-        label: "Open Doc(open help first)",
+        label: "打开文档(open help first)",
         click: () => {
           openMobileFileById(this.app, "20200812220555-lj3enxa");
         },
@@ -493,6 +497,7 @@ export default class AccessControllerPlugin extends Plugin {
         lockScreen(this.app);
       },
     });
+    //#region 添加事件总线
     menu.addItem({
       icon: "iconScrollHoriz",
       label: "事件总线",
@@ -500,304 +505,305 @@ export default class AccessControllerPlugin extends Plugin {
       submenu: [
         {
           icon: "iconSelect",
-          label: "On ws-main",
+          label: "订阅 ws-main",
           click: () => {
-            this.eventBus.on("ws-main", this.eventBusLog);
+            this.eventBus.on("ws-main", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off ws-main",
+          label: "取消订阅 ws-main",
           click: () => {
-            this.eventBus.off("ws-main", this.eventBusLog);
+            this.eventBus.off("ws-main", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On click-blockicon",
+          label: "订阅 点击-块图标",
           click: () => {
             this.eventBus.on("click-blockicon", this.blockIconEventBindThis);
           },
         },
         {
           icon: "iconClose",
-          label: "Off click-blockicon",
+          label: "取消订阅 点击-块图标",
           click: () => {
             this.eventBus.off("click-blockicon", this.blockIconEventBindThis);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-noneditableblock",
+          label: "订阅 打开-non编辑块",
           click: () => {
-            this.eventBus.on("open-noneditableblock", this.eventBusLog);
+            this.eventBus.on("open-noneditableblock", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-noneditableblock",
+          label: "取消订阅 打开-non编辑块",
           click: () => {
-            this.eventBus.off("open-noneditableblock", this.eventBusLog);
+            this.eventBus.off("open-noneditableblock", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On loaded-protyle-static",
+          label: "订阅 加载-protyle-静态的",
           click: () => {
-            this.eventBus.on("loaded-protyle-static", this.eventBusLog);
+            this.eventBus.on("loaded-protyle-static", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off loaded-protyle-static",
+          label: "取消订阅 加载-protyle-静态的",
           click: () => {
-            this.eventBus.off("loaded-protyle-static", this.eventBusLog);
+            this.eventBus.off("loaded-protyle-static", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On loaded-protyle-dynamic",
+          label: "订阅 加载-protyle-动态的",
           click: () => {
-            this.eventBus.on("loaded-protyle-dynamic", this.eventBusLog);
+            this.eventBus.on("loaded-protyle-dynamic", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off loaded-protyle-dynamic",
+          label: "取消订阅 加载-protyle-动态的",
           click: () => {
-            this.eventBus.off("loaded-protyle-dynamic", this.eventBusLog);
+            this.eventBus.off("loaded-protyle-dynamic", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On switch-protyle",
+          label: "订阅 switch-protyle",
           click: () => {
-            this.eventBus.on("switch-protyle", this.eventBusLog);
+            this.eventBus.on("switch-protyle", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off switch-protyle",
+          label: "取消订阅 switch-protyle",
           click: () => {
-            this.eventBus.off("switch-protyle", this.eventBusLog);
+            this.eventBus.off("switch-protyle", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On destroy-protyle",
+          label: "订阅 destroy-protyle",
           click: () => {
-            this.eventBus.on("destroy-protyle", this.eventBusLog);
+            this.eventBus.on("destroy-protyle", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off destroy-protyle",
+          label: "取消订阅 destroy-protyle",
           click: () => {
-            this.eventBus.off("destroy-protyle", this.eventBusLog);
+            this.eventBus.off("destroy-protyle", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On 打开目录文档书",
+          label: "订阅 打开目录文档书",
           click: () => {
-            this.eventBus.on("open-menu-doctree", this.eventBusLog);
+            this.eventBus.on("open-menu-doctree", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off 打开目录文档书",
+          label: "取消订阅 打开目录文档书",
           click: () => {
-            this.eventBus.off("open-menu-doctree", this.eventBusLog);
+            this.eventBus.off("open-menu-doctree", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-menu-blockref",
+          label: "订阅 打开目录-blockref",
           click: () => {
-            this.eventBus.on("open-menu-blockref", this.eventBusLog);
+            this.eventBus.on("open-menu-blockref", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-menu-blockref",
+          label: "取消订阅 打开目录-blockref",
           click: () => {
-            this.eventBus.off("open-menu-blockref", this.eventBusLog);
+            this.eventBus.off("open-menu-blockref", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-menu-fileannotationref",
+          label: "订阅 打开目录-fileannotationref",
           click: () => {
-            this.eventBus.on("open-menu-fileannotationref", this.eventBusLog);
+            this.eventBus.on("open-menu-fileannotationref", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-menu-fileannotationref",
+          label: "取消订阅 打开目录-fileAnnotationRef",
           click: () => {
-            this.eventBus.off("open-menu-fileannotationref", this.eventBusLog);
+            this.eventBus.off("open-menu-fileannotationref", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-menu-tag",
+          label: "订阅 打开目录-标签",
           click: () => {
-            this.eventBus.on("open-menu-tag", this.eventBusLog);
+            this.eventBus.on("open-menu-tag", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-menu-tag",
+          label: "取消订阅 打开目录-标签",
           click: () => {
-            this.eventBus.off("open-menu-tag", this.eventBusLog);
+            this.eventBus.off("open-menu-tag", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-menu-link",
+          label: "订阅 打开目录-链接",
           click: () => {
-            this.eventBus.on("open-menu-link", this.eventBusLog);
+            this.eventBus.on("open-menu-link", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-menu-link",
+          label: "取消订阅 打开目录-链接",
           click: () => {
-            this.eventBus.off("open-menu-link", this.eventBusLog);
+            this.eventBus.off("open-menu-link", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-menu-image",
+          label: "订阅 打开目录-图片",
           click: () => {
-            this.eventBus.on("open-menu-image", this.eventBusLog);
+            this.eventBus.on("open-menu-image", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-menu-image",
+          label: "取消订阅 打开目录-图片",
           click: () => {
-            this.eventBus.off("open-menu-image", this.eventBusLog);
+            this.eventBus.off("open-menu-image", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-menu-av",
+          label: "订阅 打开目录-av",
           click: () => {
-            this.eventBus.on("open-menu-av", this.eventBusLog);
+            this.eventBus.on("open-menu-av", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-menu-av",
+          label: "取消订阅 打开目录-av",
           click: () => {
-            this.eventBus.off("open-menu-av", this.eventBusLog);
+            this.eventBus.off("open-menu-av", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-menu-content",
+          label: "订阅 打开目录-内容",
           click: () => {
-            this.eventBus.on("open-menu-content", this.eventBusLog);
+            this.eventBus.on("open-menu-content", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-menu-content",
+          label: "取消订阅 打开目录-内容",
           click: () => {
-            this.eventBus.off("open-menu-content", this.eventBusLog);
+            this.eventBus.off("open-menu-content", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-menu-breadcrumbmore",
+          label: "订阅 打开目录-更多面包屑",
           click: () => {
-            this.eventBus.on("open-menu-breadcrumbmore", this.eventBusLog);
+            this.eventBus.on("open-menu-breadcrumbmore", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-menu-breadcrumbmore",
+          label: "取消订阅 打开目录-更多面包屑",
           click: () => {
-            this.eventBus.off("open-menu-breadcrumbmore", this.eventBusLog);
+            this.eventBus.off("open-menu-breadcrumbmore", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-menu-inbox",
+          label: "订阅 打开目录-inbox",
           click: () => {
-            this.eventBus.on("open-menu-inbox", this.eventBusLog);
+            this.eventBus.on("open-menu-inbox", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-menu-inbox",
+          label: "取消订阅 打开目录-inbox",
           click: () => {
-            this.eventBus.off("open-menu-inbox", this.eventBusLog);
+            this.eventBus.off("open-menu-inbox", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On input-search",
+          label: "订阅 输入搜索",
           click: () => {
-            this.eventBus.on("input-search", this.eventBusLog);
+            this.eventBus.on("input-search", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off input-search",
+          label: "取消订阅 输入搜索",
           click: () => {
-            this.eventBus.off("input-search", this.eventBusLog);
+            this.eventBus.off("input-search", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On paste",
+          label: "订阅 paste",
           click: () => {
             this.eventBus.on("paste", this.eventBusPaste);
           },
         },
         {
           icon: "iconClose",
-          label: "Off paste",
+          label: "取消订阅 paste",
           click: () => {
             this.eventBus.off("paste", this.eventBusPaste);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-siyuan-url-plugin",
+          label: "订阅 打开思源-url-plugin",
           click: () => {
-            this.eventBus.on("open-siyuan-url-plugin", this.eventBusLog);
+            this.eventBus.on("open-siyuan-url-plugin", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-siyuan-url-plugin",
+          label: "取消订阅 打开思源-url-plugin",
           click: () => {
-            this.eventBus.off("open-siyuan-url-plugin", this.eventBusLog);
+            this.eventBus.off("open-siyuan-url-plugin", 输出事件总线);
           },
         },
         {
           icon: "iconSelect",
-          label: "On open-siyuan-url-block",
+          label: "订阅 打开思源-url-block",
           click: () => {
-            this.eventBus.on("open-siyuan-url-block", this.eventBusLog);
+            this.eventBus.on("open-siyuan-url-block", 输出事件总线);
           },
         },
         {
           icon: "iconClose",
-          label: "Off open-siyuan-url-block",
+          label: "取消订阅 打开思源-url-block",
           click: () => {
-            this.eventBus.off("open-siyuan-url-block", this.eventBusLog);
+            this.eventBus.off("open-siyuan-url-block", 输出事件总线);
           },
         },
       ],
     });
+    //#region
     menu.addSeparator();
     menu.addItem({
       icon: "iconSparkles",
-      label: this.data[STORAGE_NAME].readonlyText || "Readonly",
+      label: this.data[STORAGE_NAME].readonlyText || "只读",
       type: "readonly",
     });
     if (this.isMobile) {
@@ -810,4 +816,5 @@ export default class AccessControllerPlugin extends Plugin {
       });
     }
   }
+  //#endregion
 }

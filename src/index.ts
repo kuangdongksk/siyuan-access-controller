@@ -806,6 +806,7 @@ export default class AccessControllerPlugin extends Plugin {
       label: this.data[STORAGE_NAME].readonlyText || "只读",
       type: "readonly",
     });
+
     if (this.isMobile) {
       menu.fullscreen();
     } else {

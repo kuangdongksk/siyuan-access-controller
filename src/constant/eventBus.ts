@@ -45,8 +45,20 @@ export interface IEventBusDetail {
 
 export type TEvent = IEventBusMap[keyof IEventBusMap];
 
-export function 输出事件总线(event: {
-  detail: IEventBusDetail | IEventBusMountDetail | IEventBusUnmountDetail;
-}) {
-  console.log("🚀 事件总线日志", event);
+export function 输出事件总线(event: { detail: any }) {
+  const { detail } = event;
+
+  switch (detail.cmd) {
+    case "mount":
+      break;
+    case "unmount":
+      break;
+    case "backgroundtask":
+      break;
+    case "input-search":
+      break;
+    default:
+      console.log("🚀 事件总线日志", event);
+      break;
+  }
 }

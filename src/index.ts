@@ -24,6 +24,7 @@ import { 输出事件总线 } from "./constant/eventBus";
 import "./index.scss";
 import { Icon } from "./template/Icon";
 import { CustomContent, CustomContentMobile, IDockData } from "./template/dock";
+import { onLoad } from "./event/lifeCycle";
 
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
@@ -36,12 +37,12 @@ export default class AccessControllerPlugin extends Plugin {
 
   //#region onLoad
   onload() {
-    console.log("🚀 ~ AccessControllerPlugin ~ onload ~ onload:");
-
     this.data[STORAGE_NAME] = { readonlyText: "Readonly" };
 
     const frontEnd = getFrontend();
     this.isMobile = frontEnd === "mobile" || frontEnd === "browser-mobile";
+
+    onLoad();
 
     // 图标的制作参见帮助文档
     this.addIcons(Icon);

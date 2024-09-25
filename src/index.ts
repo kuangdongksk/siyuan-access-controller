@@ -24,7 +24,7 @@ import { 输出事件总线 } from "./constant/eventBus";
 import "./index.scss";
 import { Icon } from "./template/Icon";
 import { CustomContent, CustomContentMobile, IDockData } from "./template/dock";
-import { onLoad } from "./event/lifeCycle";
+import { OnLoad, OnLayoutReady } from "./event/lifeCycle";
 
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
@@ -42,7 +42,7 @@ export default class AccessControllerPlugin extends Plugin {
     const frontEnd = getFrontend();
     this.isMobile = frontEnd === "mobile" || frontEnd === "browser-mobile";
 
-    onLoad();
+    OnLoad();
 
     // 图标的制作参见帮助文档
     this.addIcons(Icon);
@@ -243,7 +243,9 @@ export default class AccessControllerPlugin extends Plugin {
   //#region onLayoutReady
   onLayoutReady() {
     this.loadData(STORAGE_NAME);
-    console.log("🚀 布局完成", `前端: ${getFrontend()}; 后端: ${getBackend()}`);
+    const 前端 = getFrontend();
+    const 后端 = getBackend();
+    OnLayoutReady();
   }
   //#endregion
 

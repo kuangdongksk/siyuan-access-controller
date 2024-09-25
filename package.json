@@ -27,5 +27,8 @@
     "webpack": "^5.76.0",
     "webpack-cli": "^5.0.2",
     "zip-webpack-plugin": "^4.0.1"
+  },
+  "dependencies": {
+    "cash-dom": "^8.1.5"
   }
 }

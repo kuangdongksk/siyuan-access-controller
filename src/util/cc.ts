@@ -367,33 +367,4 @@
         console.error(error);
       });
   }
-
-  // sleep
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  // 等待元素渲染完成后执行
-  function whenElementExist(selector, bySetTimeout = false, delay = 40) {
-    return new Promise((resolve) => {
-      const checkForElement = () => {
-        let element = null;
-        if (typeof selector === "function") {
-          element = selector();
-        } else {
-          element = document.querySelector(selector);
-        }
-        if (element) {
-          resolve(element);
-        } else {
-          if (bySetTimeout) {
-            setTimeout(checkForElement, delay);
-          } else {
-            requestAnimationFrame(checkForElement);
-          }
-        }
-      };
-      checkForElement();
-    });
-  }
 })();

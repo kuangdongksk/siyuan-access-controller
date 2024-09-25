@@ -6,19 +6,6 @@ export async function OnLoad() {
 }
 
 export async function OnLayoutReady() {
-  // const allNoteBooks = $(".b3-list-item--hide-action");
-
-  // allNoteBooks.each((index, item) => {
-  //   // 获取此元素上的所有事件
-  //   const events = $(item, "events");
-  //   console.log("🚀 ~ allNoteBooks.each ~ events:", events);
-
-  //   // 添加事件监听
-  //   $(item).on("click", () => {
-  //     console.log("🚀 ~ OnLayoutReady ~ item:");
-  //   });
-  // });
-
   $("ul.b3-list[data-url]").each(async (_index, notebook) => {
     const notebookId = notebook.dataset.url;
     const lockNoteIds = Object.keys(await getData("lockedNoteBooks")).join(",");
@@ -41,15 +28,37 @@ export async function OnLayoutReady() {
         <div class="b3-dialog__content">
           <input class="b3-text-field fn__block" placeholder="请输入密码" type="password" />
         </div>
-        <div class="b3-dialog__action">
-          <button class="b3-button b3-button--cancel">取消</button>
-          <div class="fn__space"></div>
-          <button class="b3-button b3-button--text">确定</button>
-        </div>`,
+        `,
         width: "300px",
         height: "200px",
 
         hideCloseIcon: true,
+      });
+
+      const input = dialog.element.querySelector(".b3-text-field");
+      const content = dialog.element.querySelector(".b3-dialog__content");
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const password = input.value;
+          const noteId = noteLi.dataset.url;
+          const lockNoteBooks = getData("lockedNoteBooks");
+          if (lockNoteBooks[noteId] === password) {
+            // 删除引用和搜索忽略
+            removeRefIgnore(noteId);
+            removeSearchIgnore(noteId);
+            dialog.destroy();
+          } else {
+            if (
+              !content.lastElementChild.classList.contains(
+                "b3-text-field__error"
+              )
+            ) {
+              content.appendChild(
+                $("<div class='b3-text-field__error'>密码错误</div>")[0]
+              );
+            }
+          }
+        }
       });
     });
   });

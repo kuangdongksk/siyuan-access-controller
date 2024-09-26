@@ -15,11 +15,22 @@ export function lockNoteBooks() {
     addRefIgnore(currentNotebookId);
     addSearchIgnore(currentNotebookId);
 
-    //获取笔记标题和箭头按钮
-    const noteLi = notebook.firstElementChild as HTMLElement;
+    notebook.style.position = "relative";
+    // 添加一个span元素，放到顶层以拦截
+    const span = notebook.appendChild(document.createElement("span"));
+
+    span.style.position = "absolute";
+    span.style.top = "0";
+    span.style.left = "0";
+    span.style.width = "100%";
+    span.style.height = notebook.offsetHeight + "px";
+    span.style.zIndex = "1";
+    span.style.cursor = "not-allowed";
+    span.style.backgroundColor = "rgb(104 56 56 / 20%)";
+    span.style.backdropFilter = "blur(5px)";
 
     // 开始监听笔记事件
-    noteLi.addEventListener("click", () => {
+    span.addEventListener("click", () => {
       const dialog = new Dialog({
         title: "请输入密码",
         content: `
@@ -45,6 +56,7 @@ export function lockNoteBooks() {
             removeRefIgnore(currentNotebookId);
             removeSearchIgnore(currentNotebookId);
             dialog.destroy();
+            span.remove();
           } else {
             tip.text("密码错误");
           }

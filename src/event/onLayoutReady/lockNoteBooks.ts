@@ -1,6 +1,8 @@
 import $ from "cash-dom";
 import { Dialog } from "siyuan";
 import { getData } from "../../util/data";
+import { Mask } from "../../components/Mask";
+import { Form } from "../../components/Form";
 
 export function lockNoteBooks() {
   $("ul.b3-list[data-url]").each(async (_index, notebook) => {
@@ -15,53 +17,50 @@ export function lockNoteBooks() {
     addRefIgnore(currentNotebookId);
     addSearchIgnore(currentNotebookId);
 
-    notebook.style.position = "relative";
     // 添加一个span元素，放到顶层以拦截
-    const span = notebook.appendChild(document.createElement("span"));
-
-    span.style.position = "absolute";
-    span.style.top = "0";
-    span.style.left = "0";
-    span.style.width = "100%";
-    span.style.height = notebook.offsetHeight + "px";
-    span.style.zIndex = "1";
-    span.style.cursor = "not-allowed";
-    span.style.backgroundColor = "rgb(104 56 56 / 20%)";
-    span.style.backdropFilter = "blur(5px)";
-
-    // 开始监听笔记事件
-    span.addEventListener("click", () => {
+    const mask = new Mask(notebook);
+    mask.on("click", () => {
       const dialog = new Dialog({
         title: "请输入密码",
-        content: `
-        <div class="b3-dialog__content">
-          <input class="b3-text-field fn__block" placeholder="请输入密码" type="password" />
-          <div class="b3-text-field__tip">请输入密码</div>
-        </div>
-        `,
-        width: "300px",
-        height: "200px",
+        content: "",
+        width: "600px",
+        height: "400px",
 
         hideCloseIcon: true,
       });
-
-      const input = $("input", dialog.element).first();
-      const tip = $(".b3-text-field__tip", dialog.element).first();
-      input.on("keydown", async (e: KeyboardEvent) => {
-        if (e.key === "Enter") {
-          const password = input.val();
-
-          if (lockNoteMap.get(currentNotebookId) === password) {
-            // 删除引用和搜索忽略
-            removeRefIgnore(currentNotebookId);
-            removeSearchIgnore(currentNotebookId);
-            dialog.destroy();
-            span.remove();
-          } else {
-            tip.text("密码错误");
-          }
-        }
-      });
+      const $dialogBody = $(".b3-dialog__body", dialog.element);
+      const form = new Form(
+        [
+          {
+            fieldName: "password",
+            fieldType: "password",
+            label: "密码",
+            tip: "请输入密码",
+            placeholder: "请输入密码",
+            eventList: [
+              {
+                event: "keydown",
+                handler: (e: KeyboardEvent) => {
+                  if (e.key === "Enter") {
+                    const password = form.items[0].value.password;
+                    if (lockNoteMap.get(currentNotebookId) === password) {
+                      // 删除引用和搜索忽略
+                      removeRefIgnore(currentNotebookId);
+                      removeSearchIgnore(currentNotebookId);
+                      dialog.destroy();
+                      mask.destroy();
+                    } else {
+                      form.items[0].input.val("");
+                      form.items[0].tip.text("密码错误");
+                    }
+                  }
+                },
+              },
+            ],
+          },
+        ],
+        $dialogBody
+      );
     });
   });
 }

@@ -240,24 +240,16 @@ export default class AccessControllerPlugin extends Plugin {
   }
   //#endregion
 
-  //#region onLayoutReady
   onLayoutReady() {
     this.loadData(STORAGE_NAME);
     const 前端 = getFrontend();
     const 后端 = getBackend();
     OnLayoutReady();
   }
-  //#endregion
 
-  //#region onunload
-  onunload() {
-    console.log("🚀", this.i18n.byePlugin);
-  }
-  //#endregion
+  onunload() {}
 
-  uninstall() {
-    console.log("🚀", "uninstall");
-  }
+  uninstall() {}
 
   async updateCards(options: ICardData) {
     options.cards.sort((a: ICard, b: ICard) => {

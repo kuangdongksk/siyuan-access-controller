@@ -1,9 +1,9 @@
-import { lockNoteBooks } from "./onLayoutReady/lockNoteBooks";
+import { NoteBookLocker } from "../class/NoteBookLocker";
 
 export async function OnLoad() {
   //
 }
 
 export async function OnLayoutReady() {
-  lockNoteBooks();
+  NoteBookLocker.onLayoutReady();
 }

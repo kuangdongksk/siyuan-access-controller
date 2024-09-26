@@ -9,7 +9,6 @@ import {
   ICardData,
   IModel,
   IOperation,
-  IProtyle,
   lockScreen,
   Menu,
   openMobileFileById,
@@ -21,10 +20,11 @@ import {
   showMessage,
 } from "siyuan";
 import { 输出事件总线 } from "./constant/eventBus";
+import { OnLayoutReady, OnLoad } from "./event/lifeCycle";
 import "./index.scss";
 import { Icon } from "./template/Icon";
 import { CustomContent, CustomContentMobile, IDockData } from "./template/dock";
-import { OnLoad, OnLayoutReady } from "./event/lifeCycle";
+import { NoteBookLocker } from "./class/NoteBookLocker";
 
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
@@ -100,12 +100,8 @@ export default class AccessControllerPlugin extends Plugin {
       init() {
         this.element.innerHTML = `<div class="plugin-sample__custom-tab">${this.data.text}</div>`;
       },
-      beforeDestroy() {
-        console.log("🚀", "before destroy tab:", TAB_TYPE);
-      },
-      destroy() {
-        console.log("🚀", "destroy tab:", TAB_TYPE);
-      },
+      beforeDestroy() {},
+      destroy() {},
     });
 
     //#region 添加快捷键
@@ -120,9 +116,7 @@ export default class AccessControllerPlugin extends Plugin {
     this.addCommand({
       langKey: "getTab",
       hotkey: "⇧⌘M",
-      globalCallback: () => {
-        console.log("🚀", this.getOpenedTab());
-      },
+      globalCallback: () => {},
     });
     //#endregion
 
@@ -139,12 +133,8 @@ export default class AccessControllerPlugin extends Plugin {
       },
       data: dockData,
       type: DOCK_TYPE,
-      resize() {
-        console.log("🚀 ", DOCK_TYPE + " resize");
-      },
-      update() {
-        console.log("🚀", DOCK_TYPE + " update");
-      },
+      resize() {},
+      update() {},
       init: (dock) => {
         if (this.isMobile) {
           dock.element.innerHTML = CustomContentMobile(
@@ -155,9 +145,7 @@ export default class AccessControllerPlugin extends Plugin {
           dock.element.innerHTML = CustomContent(CustomDockTitle, dockData);
         }
       },
-      destroy() {
-        console.log("🚀", "销毁Dock:", DOCK_TYPE);
-      },
+      destroy() {},
     });
     //#endregion
 
@@ -235,8 +223,6 @@ export default class AccessControllerPlugin extends Plugin {
         },
       ],
     };
-
-    console.log("🚀", this.i18n.helloPlugin);
   }
   //#endregion
 
@@ -244,12 +230,20 @@ export default class AccessControllerPlugin extends Plugin {
     this.loadData(STORAGE_NAME);
     const 前端 = getFrontend();
     const 后端 = getBackend();
+    if (前端 === "mobile" || 前端 === "browser-mobile") {
+      return;
+    }
     OnLayoutReady();
+    this.eventBus.on("open-menu-doctree", NoteBookLocker.onOpenMenu(this.i18n));
   }
 
-  onunload() {}
+  onunload() {
+    //
+  }
 
-  uninstall() {}
+  uninstall() {
+    //
+  }
 
   async updateCards(options: ICardData) {
     options.cards.sort((a: ICard, b: ICard) => {
@@ -301,20 +295,7 @@ export default class AccessControllerPlugin extends Plugin {
     });
   }
 
-  private blockIconEvent(event: {
-    detail: {
-      blockElements: HTMLElement[];
-      menu: {
-        menus: {
-          accelerator: string; // 快捷键
-          click: () => Promise<void>;
-          iconHTML: string;
-          label: string;
-        }[];
-      };
-      protyle: IProtyle;
-    };
-  }) {
+  private blockIconEvent(event: any) {
     const detail = event.detail;
 
     detail.menu.addItem({
@@ -372,7 +353,7 @@ export default class AccessControllerPlugin extends Plugin {
   //#endregion 添加目录
   private addMenu(rect?: DOMRect) {
     const 菜单关闭回调 = () => {
-      console.log("🚀 菜单关闭回调");
+      //
     };
     const menu = new Menu("topBar示范", 菜单关闭回调);
     menu.addItem({
@@ -380,7 +361,6 @@ export default class AccessControllerPlugin extends Plugin {
       label: "对话(open help first)",
       accelerator: this.commands[0].customHotkey,
       click: () => {
-        console.log("🚀 点击了对话");
         this.showDialog();
       },
     });
@@ -400,7 +380,6 @@ export default class AccessControllerPlugin extends Plugin {
               id: this.name + TAB_TYPE,
             },
           });
-          console.log("🚀 点击了打开自定义 tab ", tab);
         },
       });
       menu.addItem({
@@ -413,7 +392,6 @@ export default class AccessControllerPlugin extends Plugin {
               path: "assets/paragraph-20210512165953-ag1nib4.svg",
             },
           });
-          console.log("🚀", tab);
         },
       });
       menu.addItem({
@@ -426,7 +404,6 @@ export default class AccessControllerPlugin extends Plugin {
               id: "20200812220555-lj3enxa",
             },
           });
-          console.log("🚀", tab);
         },
       });
       menu.addItem({
@@ -439,7 +416,6 @@ export default class AccessControllerPlugin extends Plugin {
               k: "SiYuan",
             },
           });
-          console.log("🚀", tab);
         },
       });
       menu.addItem({
@@ -452,7 +428,6 @@ export default class AccessControllerPlugin extends Plugin {
               type: "all",
             },
           });
-          console.log("🚀", tab);
         },
       });
       menu.addItem({

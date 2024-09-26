@@ -1,6 +1,11 @@
 import $ from "cash-dom";
 import { Form } from ".";
 
+export interface IEventConfig {
+  event: string;
+  handler: (e: any) => void;
+}
+
 export interface IFormItemConfig {
   fieldName: string;
   fieldType: "text" | "password";
@@ -11,7 +16,7 @@ export interface IFormItemConfig {
   /** 输入组件label的宽度，默认80 */
   labelWidth?: number;
   placeholder?: string;
-  eventList?: { event: string; handler: (e: any) => void }[];
+  eventList?: IEventConfig[];
 }
 
 export class FormItem {

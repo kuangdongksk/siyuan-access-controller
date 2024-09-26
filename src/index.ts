@@ -19,13 +19,15 @@ import {
   Setting,
   showMessage,
 } from "siyuan";
-import { 输出事件总线 } from "./constant/eventBus";
+import { NoteBookLocker } from "./class/NoteBookLocker";
 import { OnLayoutReady, OnLoad } from "./event/lifeCycle";
 import "./index.scss";
 import { Icon } from "./template/Icon";
 import { CustomContent, CustomContentMobile, IDockData } from "./template/dock";
-import { NoteBookLocker } from "./class/NoteBookLocker";
 
+export enum EDataKey {
+  上锁的笔记 = "上锁的笔记",
+}
 const STORAGE_NAME = "menu-config";
 const TAB_TYPE = "custom_tab";
 const DOCK_TYPE = "dock_tab";
@@ -36,13 +38,28 @@ export default class AccessControllerPlugin extends Plugin {
   private blockIconEventBindThis = this.blockIconEvent.bind(this);
 
   //#region onLoad
-  onload() {
-    this.data[STORAGE_NAME] = { readonlyText: "Readonly" };
+  async onload() {
+    this.data[EDataKey.上锁的笔记] = {};
 
-    const frontEnd = getFrontend();
-    this.isMobile = frontEnd === "mobile" || frontEnd === "browser-mobile";
+    const getData = async (key: EDataKey) => {
+      let data;
+      try {
+        data = await this.loadData(key);
+      } catch (error) {
+        console.log("🚀 ~ AccessControllerPlugin ~ getData ~ error:", error);
+        return null;
+      }
+      return data;
+    };
+    const saveData = async (key: EDataKey, value: any) => {
+      try {
+        await this.saveData(key, value);
+      } catch (error) {
+        console.log("🚀 ~ AccessControllerPlugin ~ saveData ~ error:", error);
+      }
+    };
 
-    OnLoad();
+    OnLoad(getData, saveData);
 
     // 图标的制作参见帮助文档
     this.addIcons(Icon);
@@ -227,7 +244,6 @@ export default class AccessControllerPlugin extends Plugin {
   //#endregion
 
   onLayoutReady() {
-    this.loadData(STORAGE_NAME);
     const 前端 = getFrontend();
     const 后端 = getBackend();
     if (前端 === "mobile" || 前端 === "browser-mobile") {

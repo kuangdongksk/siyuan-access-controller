@@ -1,32 +1,44 @@
-import $ from "cash-dom";
+import $, { Cash } from "cash-dom";
+import { IEventConfig } from "../Form/FormItem";
 
 export class Mask {
-  parent: HTMLElement;
-  element: HTMLDivElement = document.createElement("div");
+  parent;
+  element = $(document.createElement("div"));
 
-  constructor(parent: HTMLElement, style?: Partial<CSSStyleDeclaration>) {
+  constructor(
+    parent: Cash,
+    option?: {
+      eventList?: IEventConfig[];
+      style?: Partial<CSSStyleDeclaration>;
+    }
+  ) {
+    const { eventList, style } = option;
     this.parent = parent;
-    this.parent.style.position = "relative";
+    this.parent.css("position", "relative");
 
-    parent.appendChild(this.element);
+    this.parent.append(this.element);
 
-    $(this.element).css({
+    this.element.css({
       ...style,
+      position: "absolute",
+      top: "0",
+      left: "0",
+      width: "100%",
+      height: "100%",
+      zIndex: "1",
+      cursor: "not-allowed",
+      backgroundColor: "rgb(104 56 56 / 20%)",
+      backdropFilter: "blur(5px)",
     } as any);
 
-    this.element.style.position = "absolute";
-    this.element.style.top = "0";
-    this.element.style.left = "0";
-    this.element.style.width = "100%";
-    this.element.style.height = "100%";
-    this.element.style.zIndex = "1";
-    this.element.style.cursor = "not-allowed";
-    this.element.style.backgroundColor = "rgb(104 56 56 / 20%)";
-    this.element.style.backdropFilter = "blur(5px)";
+    eventList &&
+      eventList.forEach((item) => {
+        this.element.on(item.event, item.handler);
+      });
   }
 
   on(event: HTMLElementEventMap | string, handler: (e: Event) => void) {
-    $(this.element).on(event as any, handler);
+    this.element.on(event as any, handler);
   }
 
   destroy() {

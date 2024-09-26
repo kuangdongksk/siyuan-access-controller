@@ -7,15 +7,19 @@ export async function OnLoad() {
 
 export async function OnLayoutReady() {
   $("ul.b3-list[data-url]").each(async (_index, notebook) => {
-    const notebookId = notebook.dataset.url;
-    const lockNoteIds = Object.keys(await getData("lockedNoteBooks")).join(",");
+    const currentNotebookId = notebook.dataset.url;
+    const lockNoteMap = (await getData("lockedNoteBooks")) as Map<
+      string,
+      string
+    >;
+    const lockNoteIds = Array.from(lockNoteMap.keys()).join(",");
 
     // 如果笔记本没有被锁定则跳过
-    if (!lockNoteIds.includes(notebookId)) return;
+    if (!lockNoteIds.includes(currentNotebookId)) return;
 
     // 添加引用和搜索忽略
-    addRefIgnore(notebookId);
-    addSearchIgnore(notebookId);
+    addRefIgnore(currentNotebookId);
+    addSearchIgnore(currentNotebookId);
 
     //获取笔记标题和箭头按钮
     const noteLi = notebook.firstElementChild as HTMLElement;
@@ -27,6 +31,7 @@ export async function OnLayoutReady() {
         content: `
         <div class="b3-dialog__content">
           <input class="b3-text-field fn__block" placeholder="请输入密码" type="password" />
+          <div class="b3-text-field__tip">请输入密码</div>
         </div>
         `,
         width: "300px",
@@ -35,28 +40,19 @@ export async function OnLayoutReady() {
         hideCloseIcon: true,
       });
 
-      const input = dialog.element.querySelector(".b3-text-field");
-      const content = dialog.element.querySelector(".b3-dialog__content");
-      input.addEventListener("keydown", (e) => {
+      const input = $("input", dialog.element).first();
+      const tip = $(".b3-text-field__tip", dialog.element).first();
+      input.on("keydown", async (e: KeyboardEvent) => {
         if (e.key === "Enter") {
-          const password = input.value;
-          const noteId = noteLi.dataset.url;
-          const lockNoteBooks = getData("lockedNoteBooks");
-          if (lockNoteBooks[noteId] === password) {
+          const password = input.val();
+
+          if (lockNoteMap.get(currentNotebookId) === password) {
             // 删除引用和搜索忽略
-            removeRefIgnore(noteId);
-            removeSearchIgnore(noteId);
+            removeRefIgnore(currentNotebookId);
+            removeSearchIgnore(currentNotebookId);
             dialog.destroy();
           } else {
-            if (
-              !content.lastElementChild.classList.contains(
-                "b3-text-field__error"
-              )
-            ) {
-              content.appendChild(
-                $("<div class='b3-text-field__error'>密码错误</div>")[0]
-              );
-            }
+            tip.text("密码错误");
           }
         }
       });
@@ -67,9 +63,9 @@ export async function OnLayoutReady() {
 function getData(key: string) {
   return new Promise((resolve) => {
     if (key === "lockedNoteBooks") {
-      resolve({
-        "20240918162306-jnneurg": "awsd123456",
-      });
+      resolve(
+        new Map<string, string>([["20240918162306-jnneurg", "password"]])
+      );
     }
     resolve(null);
   });

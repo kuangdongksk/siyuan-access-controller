@@ -25,9 +25,10 @@ export class NoteBookLocker {
 
   static onLayoutReady() {
     $("ul.b3-list[data-url]").each(async (_index, notebook) => {
-      if (!this.已上锁吗) return;
+      const notebookId = notebook.dataset.url;
+      if (!this.已上锁吗(notebookId)) return;
 
-      this.锁定笔记本($(notebook), notebook.dataset.url);
+      this.锁定笔记本($(notebook), notebookId);
     });
   }
 

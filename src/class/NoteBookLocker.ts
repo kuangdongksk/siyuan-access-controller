@@ -1,9 +1,8 @@
-import $ from "cash-dom";
+import $, { Cash } from "cash-dom";
 import { Dialog } from "siyuan";
 import { EDataKey } from "..";
 import { Form } from "../components/Form";
 import { Mask } from "../components/Mask";
-import { objToMap } from "../util/object";
 
 export class NoteBookLocker {
   static 上锁的笔记: {
@@ -19,82 +18,19 @@ export class NoteBookLocker {
     this.getData = getData;
     this.saveData = saveData;
 
-    getData(EDataKey.上锁的笔记)
-      .then((data: any) => {
-        console.log("🚀 ~ NoteBookLocker ~ getData ~ data:", data);
-
-        this.上锁的笔记 = data;
-      })
-      .catch((e) => {
-        console.log("🚀 ~ NoteBookLocker ~ getData ~ e:", e);
-      });
+    getData(EDataKey.上锁的笔记).then((data: any) => {
+      this.上锁的笔记 = data;
+    });
   }
 
   static onLayoutReady() {
     $("ul.b3-list[data-url]").each(async (_index, notebook) => {
       const currentNotebookId = notebook.dataset.url;
-
       const lockNoteIds = Array.from(Object.keys(this.上锁的笔记)).join(",");
 
-      // 如果笔记本没有被锁定则跳过
       if (!lockNoteIds.includes(currentNotebookId)) return;
 
-      // 添加引用和搜索忽略
-      addRefIgnore(currentNotebookId);
-      addSearchIgnore(currentNotebookId);
-
-      const mask = new Mask($(notebook), {
-        eventList: [
-          {
-            event: "click",
-            handler: () => {
-              const dialog = new Dialog({
-                title: "请输入密码",
-                content: "",
-                width: "600px",
-                height: "400px",
-
-                hideCloseIcon: true,
-              });
-              const $dialogBody = $(".b3-dialog__body", dialog.element);
-              const form = new Form(
-                [
-                  {
-                    fieldName: "password",
-                    fieldType: "password",
-                    label: "密码",
-                    tip: "请输入密码",
-                    placeholder: "请输入密码",
-                    eventList: [
-                      {
-                        event: "keydown",
-                        handler: (e: KeyboardEvent) => {
-                          if (e.key === "Enter") {
-                            const password = form.items[0].value.password;
-                            if (
-                              this.上锁的笔记[currentNotebookId] === password
-                            ) {
-                              // 删除引用和搜索忽略
-                              removeRefIgnore(currentNotebookId);
-                              removeSearchIgnore(currentNotebookId);
-                              dialog.destroy();
-                              mask.destroy();
-                            } else {
-                              form.items[0].input.val("");
-                              form.items[0].tip.text("密码错误");
-                            }
-                          }
-                        },
-                      },
-                    ],
-                  },
-                ],
-                $dialogBody
-              );
-            },
-          },
-        ],
-      });
+      this.锁定笔记本($(notebook), currentNotebookId);
     });
   }
 
@@ -147,68 +83,8 @@ export class NoteBookLocker {
                           this.上锁的笔记[notebookId] = password;
                           this.saveData(EDataKey.上锁的笔记, this.上锁的笔记);
 
-                          const mask = new Mask($element.parent(), {
-                            eventList: [
-                              {
-                                event: "click",
-                                handler: () => {
-                                  const dialog = new Dialog({
-                                    title: "请输入密码",
-                                    content: "",
-                                    width: "600px",
-                                    height: "400px",
+                          this.锁定笔记本($element.parent(), notebookId);
 
-                                    hideCloseIcon: true,
-                                  });
-                                  const $dialogBody = $(
-                                    ".b3-dialog__body",
-                                    dialog.element
-                                  );
-                                  const form = new Form(
-                                    [
-                                      {
-                                        fieldName: "password",
-                                        fieldType: "password",
-                                        label: "密码",
-                                        tip: "请输入密码",
-                                        placeholder: "请输入密码",
-                                        eventList: [
-                                          {
-                                            event: "keydown",
-                                            handler: (e: KeyboardEvent) => {
-                                              if (e.key === "Enter") {
-                                                const password =
-                                                  form.items[0].value.password;
-                                                if (
-                                                  this.上锁的笔记[
-                                                    notebookId
-                                                  ] === password
-                                                ) {
-                                                  // 删除引用和搜索忽略
-                                                  removeRefIgnore(notebookId);
-                                                  removeSearchIgnore(
-                                                    notebookId
-                                                  );
-                                                  dialog.destroy();
-                                                  mask.destroy();
-                                                } else {
-                                                  form.items[0].input.val("");
-                                                  form.items[0].tip.text(
-                                                    "密码错误"
-                                                  );
-                                                }
-                                              }
-                                            },
-                                          },
-                                        ],
-                                      },
-                                    ],
-                                    $dialogBody
-                                  );
-                                },
-                              },
-                            ],
-                          });
                           dialog.destroy();
                         }
                       }
@@ -222,6 +98,63 @@ export class NoteBookLocker {
         },
       }); // 添加菜单项
     };
+  }
+
+  private static 锁定笔记本(notebook: Cash, currentNotebookId: string) {
+    // 添加引用和搜索忽略
+    addRefIgnore(currentNotebookId);
+    addSearchIgnore(currentNotebookId);
+
+    const mask = new Mask($(notebook), {
+      eventList: [
+        {
+          event: "click",
+          handler: () => {
+            const dialog = new Dialog({
+              title: "请输入密码",
+              content: "",
+              width: "600px",
+              height: "400px",
+
+              hideCloseIcon: true,
+            });
+            const $dialogBody = $(".b3-dialog__body", dialog.element);
+            const form = new Form(
+              [
+                {
+                  fieldName: "password",
+                  fieldType: "password",
+                  label: "密码",
+                  tip: "请输入密码",
+                  placeholder: "请输入密码",
+                  eventList: [
+                    {
+                      event: "keydown",
+                      handler: (e: KeyboardEvent) => {
+                        if (e.key === "Enter") {
+                          const password = form.items[0].value.password;
+                          if (this.上锁的笔记[currentNotebookId] === password) {
+                            // 删除引用和搜索忽略
+                            removeRefIgnore(currentNotebookId);
+                            removeSearchIgnore(currentNotebookId);
+                            dialog.destroy();
+                            mask.destroy();
+                          } else {
+                            form.items[0].input.val("");
+                            form.items[0].tip.text("密码错误");
+                          }
+                        }
+                      },
+                    },
+                  ],
+                },
+              ],
+              $dialogBody
+            );
+          },
+        },
+      ],
+    });
   }
 
   // 添加忽略引用搜索

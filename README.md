@@ -1,4 +1,4 @@
-[中文](https://github.com/siyuan-note/plugin-sample/blob/main/README_zh_CN.md)
+[中文](https://github.com/kuangdongksk/siyuan-access-controller/blob/main/README_zh_CN.md)
 # Access Control
 > Provide more granular access management (pure front-end implementation)
 

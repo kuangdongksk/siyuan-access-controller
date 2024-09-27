@@ -46,17 +46,24 @@ export default class AccessControllerPlugin extends Plugin {
       }
     };
 
-    OnLoad(getData, saveData);
+    OnLoad(getData, saveData, this.i18n);
   }
   //#endregion
 
-  onLayoutReady() {
+  async onLayoutReady() {
     const 后端 = getBackend();
     if (this.是移动端吗) {
       return;
     }
+
+    // await sleep(500);
+
     OnLayoutReady();
-    this.eventBus.on("open-menu-doctree", NoteBookLocker.onOpenMenu(this.i18n));
+
+    this.eventBus.on(
+      "open-menu-doctree",
+      NoteBookLocker.onOpenMenuDocTree(this.i18n)
+    );
   }
 
   onunload() {
@@ -88,4 +95,9 @@ export default class AccessControllerPlugin extends Plugin {
       textPlain: event.detail.textPlain.trim(),
     });
   }
+}
+
+// sleep 函数
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -1,24 +1,18 @@
 {
   "name": "siyuan-access-controller",
-  "author": "Vanessa",
-  "url": "https://github.com/siyuan-note/plugin-sample",
-  "version": "0.3.5",
-  "minAppVersion": "3.0.12",
+  "author": "kuangdongksk",
+  "url": "https://github.com/kuangdongksk/siyuan-access-controller.git",
+  "version": "0.0.1",
+  "minAppVersion": "3.0.17",
   "backends": ["windows", "linux", "darwin", "ios", "android", "docker"],
-  "frontends": [
-    "desktop",
-    "mobile",
-    "browser-desktop",
-    "browser-mobile",
-    "desktop-window"
-  ],
+  "frontends": ["desktop", "browser-desktop", "desktop-window"],
   "displayName": {
-    "default": "Plugin Sample",
-    "zh_CN": "插件示例"
+    "default": "access-controller",
+    "zh_CN": "访问控制"
   },
   "description": {
-    "default": "This is a plugin sample",
-    "zh_CN": "这是一个插件示例"
+    "default": "This is a access-controller",
+    "zh_CN": "这是一个访问控制插件，纯前端实现"
   },
   "readme": {
     "default": "README.md",
@@ -30,5 +24,12 @@
     "github": "",
     "custom": ["https://ld246.com/sponsor"]
   },
-  "keywords": ["sample", "示例"]
+  "keywords": [
+    "访问控制",
+    "密码",
+    "加密",
+    "access-controller",
+    "password",
+    "encryption"
+  ]
 }

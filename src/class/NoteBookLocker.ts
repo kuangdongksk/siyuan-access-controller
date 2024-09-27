@@ -1,5 +1,5 @@
 import $, { Cash } from "cash-dom";
-import { Dialog } from "siyuan";
+import { Dialog, IMenuItemOption } from "siyuan";
 import { EDataKey } from "..";
 import { Form } from "../components/Form";
 import { Mask } from "../components/Mask";
@@ -25,12 +25,9 @@ export class NoteBookLocker {
 
   static onLayoutReady() {
     $("ul.b3-list[data-url]").each(async (_index, notebook) => {
-      const currentNotebookId = notebook.dataset.url;
-      const lockNoteIds = Array.from(Object.keys(this.上锁的笔记)).join(",");
+      if (!this.已上锁吗) return;
 
-      if (!lockNoteIds.includes(currentNotebookId)) return;
-
-      this.锁定笔记本($(notebook), currentNotebookId);
+      this.锁定笔记本($(notebook), notebook.dataset.url);
     });
   }
 
@@ -39,7 +36,61 @@ export class NoteBookLocker {
       const $element = $(event.detail.elements[0]);
       const notebookId = $element.parent().data("url");
 
-      event.detail.menu.addItem({
+      if (this.已上锁吗(notebookId)) {
+        event.detail.menu.addItem({
+          iconHTML: "",
+          label: i18n.锁定笔记本,
+          click: () => {
+            this.锁定笔记本($element.parent(), notebookId);
+          },
+        });
+        event.detail.menu.addItem({
+          iconHTML: "",
+          label: i18n.移除笔记密码,
+          click: () => {
+            const dialog = new Dialog({
+              title: i18n.移除笔记密码,
+              content: "",
+              width: "600px",
+              height: "400px",
+            });
+
+            const $dialogBody = $(".b3-dialog__body", dialog.element);
+            const form = new Form(
+              [
+                {
+                  fieldName: "password",
+                  fieldType: "password",
+                  label: i18n.密码,
+                  tip: i18n.请输入密码,
+                  placeholder: i18n.请输入密码,
+                  eventList: [
+                    {
+                      event: "keydown",
+                      handler: (e: KeyboardEvent) => {
+                        if (e.key === "Enter") {
+                          const password = this.上锁的笔记[notebookId];
+                          if (password === form.items[0].value.password) {
+                            delete this.上锁的笔记[notebookId];
+                            this.saveData(EDataKey.上锁的笔记, this.上锁的笔记);
+                            removeRefIgnore(notebookId);
+                            removeSearchIgnore(notebookId);
+                            dialog.destroy();
+                          }
+                        }
+                      },
+                    },
+                  ],
+                },
+              ],
+              $dialogBody
+            );
+          },
+        });
+        return;
+      }
+
+      const 为笔记本设置密码: IMenuItemOption = {
         iconHTML: "",
         label: i18n.为笔记本设置密码,
         click: () => {
@@ -96,7 +147,8 @@ export class NoteBookLocker {
             $dialogBody
           );
         },
-      }); // 添加菜单项
+      };
+      event.detail.menu.addItem(为笔记本设置密码);
     };
   }
 
@@ -155,6 +207,10 @@ export class NoteBookLocker {
         },
       ],
     });
+  }
+
+  private static 已上锁吗(notebookId: string) {
+    return this.上锁的笔记[notebookId] !== undefined;
   }
 
   // 添加忽略引用搜索

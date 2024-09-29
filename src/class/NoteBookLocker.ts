@@ -168,7 +168,8 @@ export class NoteBookLocker {
       eventList: [
         {
           event: "click",
-          handler: () => {
+          handler: (event) => {
+            event.stopPropagation();
             const dialog = new Dialog({
               title: "请输入密码",
               content: "",

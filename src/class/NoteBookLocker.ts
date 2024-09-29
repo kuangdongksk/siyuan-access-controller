@@ -1,10 +1,5 @@
 import $, { Cash } from "cash-dom";
-import {
-  Dialog,
-  EventMenu,
-  IMenuItemOption,
-  IWebSocketData
-} from "siyuan";
+import { Dialog, EventMenu, IMenuItemOption, IWebSocketData } from "siyuan";
 import { EDataKey, sleep } from "..";
 import { Form } from "../components/Form";
 import { IFormItemConfig } from "../components/Form/FormItem";
@@ -263,6 +258,11 @@ export class NoteBookLocker {
 
       this.锁定笔记($(notebook), dataId);
     });
+  }
+
+  private static 关闭打开的笔记() {
+    
+    //
   }
 }
 

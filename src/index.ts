@@ -60,10 +60,11 @@ export default class AccessControllerPlugin extends Plugin {
 
     OnLayoutReady();
 
-    this.eventBus.on(
-      "open-menu-doctree",
-      NoteBookLocker.onOpenMenuDocTree(this.i18n)
+    this.eventBus.on("open-menu-doctree", (event) =>
+      NoteBookLocker.onOpenMenuDocTree(event)
     );
+
+    this.eventBus.on("ws-main", (event) => NoteBookLocker.onWSMain(event));
   }
 
   onunload() {

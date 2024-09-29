@@ -28,22 +28,7 @@ export class NoteBookLocker {
   }
 
   static onLayoutReady() {
-    $("ul.b3-list[data-url]").each(async (_index, notebook) => {
-      const dataId = notebook.dataset.url;
-
-      // const notes = $("ul", notebook).children("li");
-
-      // notes.each((_index, note) => {
-      //   const dataId = $(note).data("nodeId");
-      //   if (!this.已上锁吗(dataId)) return;
-
-      //   this.锁定笔记($(note), dataId);
-      // });
-
-      if (!this.已上锁吗(dataId)) return;
-
-      this.锁定笔记($(notebook), dataId);
-    });
+    this.遍历笔记并上锁();
   }
 
   static onOpenMenuDocTree(i18n: any) {
@@ -234,6 +219,30 @@ export class NoteBookLocker {
   private static 已上锁吗(notebookId: string) {
     if (!notebookId) return false;
     return this.上锁的笔记[notebookId] !== undefined;
+  }
+
+  private static 遍历笔记并上锁() {
+    const 打开的笔记本 = $("ul.b3-list[data-url]");
+    const 关闭的笔记本 = $(
+      "li.b3-list-item.b3-list-item--hide-action[data-type='open']"
+    );
+    const 所有的笔记本 = 打开的笔记本.add(关闭的笔记本);
+    所有的笔记本.each(async (_index, notebook) => {
+      const dataId = notebook.dataset.url;
+
+      // const notes = $("ul", notebook).children("li");
+
+      // notes.each((_index, note) => {
+      //   const dataId = $(note).data("nodeId");
+      //   if (!this.已上锁吗(dataId)) return;
+
+      //   this.锁定笔记($(note), dataId);
+      // });
+
+      if (!this.已上锁吗(dataId)) return;
+
+      this.锁定笔记($(notebook), dataId);
+    });
   }
 
   // 添加忽略引用搜索

@@ -27,7 +27,6 @@ export class Mask {
       height: "100%",
       zIndex: "1",
       cursor: "not-allowed",
-      backgroundColor: "rgb(104 56 56 / 20%)",
       backdropFilter: "blur(5px)",
     } as any);
 

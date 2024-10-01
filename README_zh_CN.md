@@ -2,7 +2,11 @@
 
 > 提供更细粒度的的访问管理（纯前端实现）
 
-目前只能锁笔记本，没有处理锁文档，锁文档会出现异常
+目前只能锁笔记本
+
+# ⚠️处于早期开发测试阶段，会产生一些小BUG
+
+请到github提[issue](https://github.com/kuangdongksk/siyuan-access-controller/issues)
 
 ## 如何使用
 
@@ -23,5 +27,7 @@
 ## 开发计划
 
 1. 锁定笔记本时自动关闭已打开的文档
+
+详细的开发计划请移步[GitHub ](https://github.com/users/kuangdongksk/projects/4)
 
 之后估计不会有大的改动，如果有好的想法和建议，欢迎反馈！

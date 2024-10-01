@@ -10,6 +10,7 @@ export class Mask {
     option?: {
       eventList?: IEventConfig[];
       style?: Partial<CSSStyleDeclaration>;
+      data?: { [key: string]: any };
     }
   ) {
     const { eventList, style } = option;
@@ -34,6 +35,9 @@ export class Mask {
       eventList.forEach((item) => {
         this.element.on(item.event, item.handler);
       });
+
+    // 添加data
+    this.element.data(option?.data);
   }
 
   on(event: HTMLElementEventMap | string, handler: (e: Event) => void) {

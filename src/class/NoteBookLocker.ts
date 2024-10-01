@@ -62,7 +62,7 @@ export class NoteBookLocker {
 
     const dataId = $element.parent().data("url") || $element.data("nodeId");
 
-    if (this.已上锁吗(dataId)) {
+    if (this.已设置锁吗(dataId)) {
       detail.menu.addItem({
         iconHTML: "",
         label: this.i18n.锁定笔记,
@@ -177,7 +177,9 @@ export class NoteBookLocker {
     // 添加引用和搜索忽略
     addRefIgnore(currentNotebookId);
     addSearchIgnore(currentNotebookId);
+    if (notebook.hasClass("note-book-Locker-locked")) return;
 
+    notebook.addClass("note-book-Locker-locked");
     const mask = new Mask($(notebook), {
       eventList: [
         {
@@ -208,6 +210,7 @@ export class NoteBookLocker {
                         if (e.key === "Enter") {
                           const password = form.items[0].value.password;
                           if (this.上锁的笔记[currentNotebookId] === password) {
+                            notebook.removeClass("note-book-Locker-locked");
                             // 删除引用和搜索忽略
                             removeRefIgnore(currentNotebookId);
                             removeSearchIgnore(currentNotebookId);
@@ -231,7 +234,7 @@ export class NoteBookLocker {
     });
   }
 
-  private static 已上锁吗(notebookId: string) {
+  private static 已设置锁吗(notebookId: string) {
     if (!notebookId) return false;
     return this.上锁的笔记[notebookId] !== undefined;
   }
@@ -249,19 +252,18 @@ export class NoteBookLocker {
 
       // notes.each((_index, note) => {
       //   const dataId = $(note).data("nodeId");
-      //   if (!this.已上锁吗(dataId)) return;
+      //   if (!this.已设置锁吗(dataId)) return;
 
       //   this.锁定笔记($(note), dataId);
       // });
 
-      if (!this.已上锁吗(dataId)) return;
+      if (!this.已设置锁吗(dataId)) return;
 
       this.锁定笔记($(notebook), dataId);
     });
   }
 
   private static 关闭打开的笔记() {
-    
     //
   }
 }

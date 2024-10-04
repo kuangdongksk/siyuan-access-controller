@@ -4,6 +4,8 @@ import { EDataKey, sleep } from "../..";
 import { IFormItemConfig } from "../../components/Form/FormItem";
 import { 拦截蒙层 } from "./components/拦截蒙层";
 import { 表单对话框 } from "./components/表单对话框";
+import { fetchSyncPost } from "../../API/util";
+import { likeQuery } from "../../API/SQL";
 
 export class NoteBookLocker {
   static i18n: any;
@@ -207,39 +209,57 @@ export class NoteBookLocker {
     });
   }
 
-  private static 遍历笔记标签页并上锁() {
+  private static async 遍历笔记标签页并上锁() {
     const 所有打开的标签页 = $("ul.layout-tab-bar").children("li[data-type]");
 
-    所有打开的标签页.each((_index, 标签页) => {
-      const 初始数据 = $(标签页).data("initdata");
-      const dataId = 初始数据?.notebookId;
-      if (!this.已设置锁吗(dataId)) return;
+    await sleep(500);
+    await likeQuery(
+      $(".protyle-wysiwyg.protyle-wysiwyg--attr")
+        .children("[data-node-index]")
+        .first()
+        .data("nodeId")
+    ).then(({ data }) => {
+      const 当前标签页的笔记本id = data[0].box;
 
-      $(标签页).addClass("note-book-Locker-locked");
-
-      new 拦截蒙层(
-        $(标签页),
-        {},
-        {
-          i18n: this.i18n,
-          笔记数据: this.上锁的笔记,
-          当前id: dataId,
+      const 所有标签页 = [];
+      所有打开的标签页.each((_index, 标签页) => {
+        if ($(标签页).hasClass("item--focus")) {
+          所有标签页.push({
+            根元素: $(标签页),
+            id: 当前标签页的笔记本id,
+          });
+          return;
         }
-      );
+        所有标签页.push({
+          根元素: $(标签页),
+          id: $(标签页).data("initdata")?.notebookId,
+        });
+      });
 
-      if ($(标签页).hasClass("item--focus")) {
-        const 内容区域 = $(".layout-tab-container");
+      所有标签页.push({
+        根元素: $(".layout-tab-container").children(".protyle"),
+        id: 当前标签页的笔记本id,
+      });
 
-        new 拦截蒙层(
-          内容区域,
-          {},
-          {
-            i18n: this.i18n,
-            笔记数据: this.上锁的笔记,
-            当前id: dataId,
-          }
-        );
-      }
+      所有标签页.forEach((标签页) => {
+        if (this.已设置锁吗(标签页.id)) {
+          const 内容区域 = 标签页.根元素;
+
+          new 拦截蒙层(
+            内容区域,
+            {
+              style: {
+                backdropFilter: "blur(10px)",
+              },
+            },
+            {
+              i18n: this.i18n,
+              笔记数据: this.上锁的笔记,
+              当前id: 标签页.id,
+            }
+          );
+        }
+      });
     });
   }
 }
@@ -286,38 +306,6 @@ async function removeSearchIgnore(noteId: string) {
     raw = raw.replace(content, "");
   }
   putFileContent(path, raw);
-}
-
-// 请求api
-// returnType json返回json格式，text返回文本格式
-async function fetchSyncPost(
-  url: string,
-  data: any | FormData,
-  returnType = "json"
-) {
-  const init: {
-    method: string;
-    body?: string | FormData;
-  } = {
-    method: "POST",
-  };
-  if (data) {
-    if (data instanceof FormData) {
-      init.body = data;
-    } else {
-      init.body = JSON.stringify(data);
-    }
-  }
-  try {
-    const res = await fetch(url, init);
-    const res2 = returnType === "json" ? await res.json() : await res.text();
-    return res2;
-  } catch (e) {
-    console.log(e);
-    return returnType === "json"
-      ? { code: e.code || 1, msg: e.message || "", data: null }
-      : "";
-  }
 }
 
 // 读取文件

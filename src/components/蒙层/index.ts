@@ -21,6 +21,7 @@ export class 蒙层 {
     this.父元素.append(this.蒙层);
 
     this.蒙层.css({
+      backdropFilter: "blur(5px)",
       ...style,
       position: "absolute",
       top: "0",
@@ -29,7 +30,6 @@ export class 蒙层 {
       height: "100%",
       zIndex: "1",
       cursor: "not-allowed",
-      backdropFilter: "blur(5px)",
     } as any);
 
     事件列表 &&

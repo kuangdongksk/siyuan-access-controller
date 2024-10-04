@@ -2,7 +2,7 @@ import $, { Cash } from "cash-dom";
 import { EventMenu, IMenuItemOption, IWebSocketData } from "siyuan";
 import { EDataKey, sleep } from "../..";
 import { IFormItemConfig } from "../../components/Form/FormItem";
-import { Mask } from "../../components/Mask";
+import { 拦截蒙层 } from "./components/拦截蒙层";
 import { 表单对话框 } from "./components/表单对话框";
 
 export class NoteBookLocker {
@@ -162,43 +162,15 @@ export class NoteBookLocker {
     if (notebook.hasClass("note-book-Locker-locked")) return;
 
     notebook.addClass("note-book-Locker-locked");
-    const mask = new Mask($(notebook), {
-      eventList: [
-        {
-          event: "click",
-          handler: (event) => {
-            event.stopPropagation();
-            const { 表单, 对话框 } = 表单对话框(this.i18n.请输入密码);
-            表单.配置 = [
-              {
-                ...this.密码框,
-                eventList: [
-                  {
-                    event: "keydown",
-                    handler: (e: KeyboardEvent) => {
-                      if (e.key === "Enter") {
-                        const password = 表单.所有项[0].value.password;
-                        if (this.上锁的笔记[currentNotebookId] === password) {
-                          notebook.removeClass("note-book-Locker-locked");
-                          // 删除引用和搜索忽略
-                          removeRefIgnore(currentNotebookId);
-                          removeSearchIgnore(currentNotebookId);
-                          对话框.destroy();
-                          mask.destroy();
-                        } else {
-                          表单.所有项[0].input.val("");
-                          表单.所有项[0].tip.text(this.i18n.密码错误);
-                        }
-                      }
-                    },
-                  },
-                ],
-              },
-            ];
-          },
-        },
-      ],
-    });
+    new 拦截蒙层(
+      $(notebook),
+      {},
+      {
+        i18n: this.i18n,
+        笔记数据: this.上锁的笔记,
+        当前id: currentNotebookId,
+      }
+    );
   }
 
   private static 已设置锁吗(notebookId: string) {
@@ -245,78 +217,28 @@ export class NoteBookLocker {
 
       $(标签页).addClass("note-book-Locker-locked");
 
-      const mask = new Mask($(标签页), {
-        eventList: [
-          {
-            event: "click",
-            handler: (event) => {
-              event.stopPropagation();
-              const { 表单, 对话框 } = 表单对话框(this.i18n.请输入密码);
-              表单.配置 = [
-                {
-                  ...this.密码框,
-                  eventList: [
-                    {
-                      event: "keydown",
-                      handler: (e: KeyboardEvent) => {
-                        if (e.key === "Enter") {
-                          const password = 表单.所有项[0].value.password;
-                          if (this.上锁的笔记[dataId] === password) {
-                            $(标签页).removeClass("note-book-Locker-locked");
-                            对话框.destroy();
-                            mask.destroy();
-                          } else {
-                            表单.所有项[0].input.val("");
-                            表单.所有项[0].tip.text(this.i18n.密码错误);
-                          }
-                        }
-                      },
-                    },
-                  ],
-                },
-              ];
-            },
-          },
-        ],
-      });
+      new 拦截蒙层(
+        $(标签页),
+        {},
+        {
+          i18n: this.i18n,
+          笔记数据: this.上锁的笔记,
+          当前id: dataId,
+        }
+      );
 
       if ($(标签页).hasClass("item--focus")) {
         const 内容区域 = $(".layout-tab-container");
 
-        const mask = new Mask(内容区域, {
-          eventList: [
-            {
-              event: "click",
-              handler: (event) => {
-                event.stopPropagation();
-                const { 表单, 对话框 } = 表单对话框(this.i18n.请输入密码);
-                表单.配置 = [
-                  {
-                    ...this.密码框,
-                    eventList: [
-                      {
-                        event: "keydown",
-                        handler: (e: KeyboardEvent) => {
-                          if (e.key === "Enter") {
-                            const password = 表单.所有项[0].value.password;
-                            if (this.上锁的笔记[dataId] === password) {
-                              $(标签页).removeClass("note-book-Locker-locked");
-                              对话框.destroy();
-                              mask.destroy();
-                            } else {
-                              表单.所有项[0].input.val("");
-                              表单.所有项[0].tip.text(this.i18n.密码错误);
-                            }
-                          }
-                        },
-                      },
-                    ],
-                  },
-                ];
-              },
-            },
-          ],
-        });
+        new 拦截蒙层(
+          内容区域,
+          {},
+          {
+            i18n: this.i18n,
+            笔记数据: this.上锁的笔记,
+            当前id: dataId,
+          }
+        );
       }
     });
   }

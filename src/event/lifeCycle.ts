@@ -1,5 +1,5 @@
 import { EDataKey } from "..";
-import { NoteBookLocker } from "../class/NoteBookLocker";
+import { NoteBookLocker } from "../class/访问控制器";
 
 export async function OnLoad(
   getData: (key: EDataKey) => Promise<any>,

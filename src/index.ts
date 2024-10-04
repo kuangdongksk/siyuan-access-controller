@@ -6,7 +6,7 @@ import {
   IModel,
   Plugin,
 } from "siyuan";
-import { NoteBookLocker } from "./class/NoteBookLocker";
+import { NoteBookLocker } from "./class/访问控制器";
 import { OnLayoutReady, OnLoad } from "./event/lifeCycle";
 import "./index.scss";
 

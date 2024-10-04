@@ -20,7 +20,7 @@ export interface IFormItemConfig {
 }
 
 export class FormItem {
-  element = $(document.createElement("div"));
+  表单项 = $(document.createElement("div"));
   label = $(document.createElement("div"));
   space = $(document.createElement("span"));
   input = $(document.createElement("input"));
@@ -40,8 +40,8 @@ export class FormItem {
       eventList,
     } = config;
 
-    $(parent.element).append(this.element);
-    this.element.addClass("fn__flex b3-label config__item");
+    $(parent.表单).append(this.表单项);
+    this.表单项.addClass("fn__flex b3-label config__item");
 
     this.label.css({
       width: labelWidth + "px",
@@ -63,7 +63,7 @@ export class FormItem {
     eventList &&
       eventList.forEach((item) => this.input.on(item.event, item.handler));
 
-    this.element.append(
+    this.表单项.append(
       this.label,
       this.space,
       this.input,
@@ -76,5 +76,9 @@ export class FormItem {
     return {
       [this.input.attr("name")]: this.input.val(),
     };
+  }
+
+  销毁() {
+    this.表单项.remove();
   }
 }

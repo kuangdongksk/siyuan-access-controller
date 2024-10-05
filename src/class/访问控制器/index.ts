@@ -187,7 +187,14 @@ export class NoteBookLocker {
 
   static async onWSMain(event: CustomEvent<IWebSocketData>) {
     if (event.detail?.data?.box) {
-      if (event.detail?.data?.existed === false) return;
+      console.log(
+        "🚀 ~ NoteBookLocker ~ onWSMain ~ event.detail?.data:",
+        event.detail?.data
+      );
+      const 打开笔记本 = event.detail?.data?.existed === false;
+      const 新建文档或重命名文档 = Boolean(event.detail?.data?.id);
+
+      if (打开笔记本 || 新建文档或重命名文档) return "不上锁";
       await sleep(100);
       this.遍历笔记并上锁();
     }
@@ -254,7 +261,7 @@ export class NoteBookLocker {
   private static async 遍历笔记页签并上锁() {
     const 所有打开的页签 = $("ul.layout-tab-bar").children("li[data-type]");
 
-    await sleep(300);
+    await sleep(200);
     await likeQuery(
       $(".protyle-wysiwyg.protyle-wysiwyg--attr")
         .children("[data-node-index]")

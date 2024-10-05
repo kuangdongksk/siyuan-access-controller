@@ -1,5 +1,10 @@
 import $, { Cash } from "cash-dom";
-import { EventMenu, IMenuItemOption, IWebSocketData } from "siyuan";
+import {
+  EventMenu,
+  IMenuBaseDetail,
+  IMenuItemOption,
+  IWebSocketData,
+} from "siyuan";
 import { EDataKey, sleep } from "../..";
 import { IFormItemConfig } from "../../components/Form/FormItem";
 import { 拦截蒙层 } from "./components/拦截蒙层";
@@ -10,6 +15,7 @@ import { likeQuery } from "../../API/SQL";
 export class NoteBookLocker {
   static i18n: any;
 
+  // static 当前页签对应的笔记本id: string;
   static 密码框: IFormItemConfig;
   static 确认密码框: IFormItemConfig;
   static 上锁的笔记: {
@@ -73,7 +79,7 @@ export class NoteBookLocker {
         iconHTML: "",
         label: this.i18n.锁定笔记,
         click: () => {
-          this.锁定笔记($element.parent(), dataId);
+          this.添加拦截蒙层($element.parent(), dataId);
         },
       });
 
@@ -128,7 +134,7 @@ export class NoteBookLocker {
                 this.上锁的笔记[dataId] = password;
                 this.saveData(EDataKey.上锁的笔记, this.上锁的笔记);
 
-                this.锁定笔记($element.parent(), dataId);
+                this.添加拦截蒙层($element.parent(), dataId);
 
                 对话框.destroy();
               }
@@ -148,6 +154,40 @@ export class NoteBookLocker {
     event.detail.menu.addItem(为笔记设置密码);
   }
 
+  static async 打开内容区菜单(event: CustomEvent<IMenuBaseDetail>) {
+    const detail = event.detail;
+
+    detail.menu.addItem({
+      iconHTML: "",
+      label: this.i18n.锁定笔记,
+      click: () => {
+        likeQuery(
+          $(".protyle-wysiwyg.protyle-wysiwyg--attr")
+            .children("[data-node-index]")
+            .first()
+            .data("nodeId")
+        ).then(({ data }) => {
+          const dataId = data[0].box;
+
+          if (this.已设置锁吗(dataId)) {
+            this.添加拦截蒙层(
+              $(".layout-tab-container").children(".protyle"),
+              dataId
+            );
+            this.添加拦截蒙层(
+              $(".layout-tab-bar").children("li.item--focus"),
+              dataId
+            );
+          }
+        });
+      },
+    });
+  }
+
+  static async 打开页签菜单(event: CustomEvent<IMenuBaseDetail>) {
+    console.log("🚀 ~ NoteBookLocker ~ event:", event);
+  }
+
   static async onWSMain(event: CustomEvent<IWebSocketData>) {
     if (event.detail?.data?.box) {
       if (event.detail?.data?.existed === false) return;
@@ -157,20 +197,24 @@ export class NoteBookLocker {
   }
   //#endregion 生命周期
 
-  private static 锁定笔记(notebook: Cash, currentNotebookId: string) {
+  private static 添加拦截蒙层(根元素: Cash, 当前笔记本Id: string) {
     // 添加引用和搜索忽略
-    addRefIgnore(currentNotebookId);
-    addSearchIgnore(currentNotebookId);
-    if (notebook.hasClass("note-book-Locker-locked")) return;
+    addRefIgnore(当前笔记本Id);
+    addSearchIgnore(当前笔记本Id);
+    if (根元素.hasClass("note-book-Locker-locked")) return;
 
-    notebook.addClass("note-book-Locker-locked");
+    根元素.addClass("note-book-Locker-locked");
     new 拦截蒙层(
-      $(notebook),
-      {},
+      $(根元素),
+      {
+        style: {
+          backdropFilter: "blur(15px)",
+        },
+      },
       {
         i18n: this.i18n,
         笔记数据: this.上锁的笔记,
-        当前id: currentNotebookId,
+        当前id: 当前笔记本Id,
       }
     );
   }
@@ -182,7 +226,7 @@ export class NoteBookLocker {
 
   private static 遍历笔记并上锁() {
     this.遍历笔记目录并上锁();
-    this.遍历笔记标签页并上锁();
+    this.遍历笔记页签并上锁();
   }
 
   private static 遍历笔记目录并上锁() {
@@ -205,59 +249,46 @@ export class NoteBookLocker {
 
       if (!this.已设置锁吗(dataId)) return;
 
-      this.锁定笔记($(notebook), dataId);
+      this.添加拦截蒙层($(notebook), dataId);
     });
   }
 
-  private static async 遍历笔记标签页并上锁() {
-    const 所有打开的标签页 = $("ul.layout-tab-bar").children("li[data-type]");
+  private static async 遍历笔记页签并上锁() {
+    const 所有打开的页签 = $("ul.layout-tab-bar").children("li[data-type]");
 
-    await sleep(500);
+    await sleep(300);
     await likeQuery(
       $(".protyle-wysiwyg.protyle-wysiwyg--attr")
         .children("[data-node-index]")
         .first()
         .data("nodeId")
     ).then(({ data }) => {
-      const 当前标签页的笔记本id = data[0].box;
+      const 当前页签的笔记本id = data[0].box;
 
-      const 所有标签页 = [];
-      所有打开的标签页.each((_index, 标签页) => {
-        if ($(标签页).hasClass("item--focus")) {
-          所有标签页.push({
-            根元素: $(标签页),
-            id: 当前标签页的笔记本id,
+      const 所有页签 = [];
+      所有打开的页签.each((_index, 页签) => {
+        if ($(页签).hasClass("item--focus")) {
+          所有页签.push({
+            根元素: $(页签),
+            id: 当前页签的笔记本id,
           });
           return;
         }
-        所有标签页.push({
-          根元素: $(标签页),
-          id: $(标签页).data("initdata")?.notebookId,
+        所有页签.push({
+          根元素: $(页签),
+          id: $(页签).data("initdata")?.notebookId,
         });
       });
 
-      所有标签页.push({
+      所有页签.push({
         根元素: $(".layout-tab-container").children(".protyle"),
-        id: 当前标签页的笔记本id,
+        id: 当前页签的笔记本id,
       });
 
-      所有标签页.forEach((标签页) => {
-        if (this.已设置锁吗(标签页.id)) {
-          const 内容区域 = 标签页.根元素;
-
-          new 拦截蒙层(
-            内容区域,
-            {
-              style: {
-                backdropFilter: "blur(10px)",
-              },
-            },
-            {
-              i18n: this.i18n,
-              笔记数据: this.上锁的笔记,
-              当前id: 标签页.id,
-            }
-          );
+      所有页签.forEach((页签) => {
+        if (this.已设置锁吗(页签.id)) {
+          const { 根元素, id } = 页签;
+          this.添加拦截蒙层(根元素, id);
         }
       });
     });

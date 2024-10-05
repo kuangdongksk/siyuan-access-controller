@@ -21,6 +21,7 @@ export default class AccessControllerPlugin extends Plugin {
   //#region onLoad
   async onload() {
     const 前端 = getFrontend();
+
     this.是移动端吗 = 前端 === "mobile" || 前端 === "browser-mobile";
     if (this.是移动端吗) {
       return;
@@ -38,6 +39,7 @@ export default class AccessControllerPlugin extends Plugin {
       }
       return data;
     };
+
     const saveData = async (key: EDataKey, value: any) => {
       try {
         await this.saveData(key, value);
@@ -56,12 +58,17 @@ export default class AccessControllerPlugin extends Plugin {
       return;
     }
 
-    // await sleep(500);
-
     OnLayoutReady();
 
     this.eventBus.on("open-menu-doctree", (event) =>
       NoteBookLocker.onOpenMenuDocTree(event)
+    );
+
+    this.eventBus.on("open-menu-content", (event) =>
+      NoteBookLocker.打开内容区菜单(event)
+    );
+    this.eventBus.on("click-blockicon", (event) =>
+      NoteBookLocker.打开内容区菜单(event as any)
     );
 
     this.eventBus.on("ws-main", (event) => NoteBookLocker.onWSMain(event));

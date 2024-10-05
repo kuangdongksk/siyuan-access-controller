@@ -1,10 +1,12 @@
 # 访问控制
 
 > 提供更细粒度的的访问管理（纯前端实现）
+>
+> 此页面可能信息滞后，了解详细信息请移步 [访问控制插件](https://ld246.com/article/1728101918141)
 
 目前只能锁笔记本
 
-# ⚠️处于早期开发测试阶段，会产生一些小BUG
+# ⚠️处于早期开发测试阶段，会产生一些BUG
 
 请到github提[issue](https://github.com/kuangdongksk/siyuan-access-controller/issues)
 

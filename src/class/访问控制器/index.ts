@@ -81,6 +81,7 @@ export class NoteBookLocker {
         label: this.i18n.锁定笔记,
         click: () => {
           this.添加拦截蒙层($element.parent(), dataId);
+          this.锁定指定笔记本下的页签(dataId);
         },
       });
 
@@ -187,10 +188,6 @@ export class NoteBookLocker {
 
   static async onWSMain(event: CustomEvent<IWebSocketData>) {
     if (event.detail?.data?.box) {
-      console.log(
-        "🚀 ~ NoteBookLocker ~ onWSMain ~ event.detail?.data:",
-        event.detail?.data
-      );
       const 打开笔记本 = event.detail?.data?.existed === false;
       const 新建文档或重命名文档 = Boolean(event.detail?.data?.id);
 
@@ -296,6 +293,17 @@ export class NoteBookLocker {
           this.添加拦截蒙层(根元素, id);
         }
       });
+    });
+  }
+
+  private static 锁定指定笔记本下的页签(笔记本Id: string) {
+    const 所有页签 = $("ul.layout-tab-bar").children("li[data-type]");
+
+    所有页签.each((_index, 页签) => {
+      const notebookId = $(页签).data("initdata")?.notebookId;
+      if (笔记本Id !== notebookId) return;
+
+      this.添加拦截蒙层($(页签), notebookId);
     });
   }
 }

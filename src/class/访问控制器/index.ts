@@ -11,6 +11,7 @@ import { 拦截蒙层 } from "./components/拦截蒙层";
 import { 表单对话框 } from "./components/表单对话框";
 import { fetchSyncPost } from "../../API/util";
 import { likeQuery } from "../../API/SQL";
+import { 拦截蒙层zIndex } from "../../constant/style";
 
 export class NoteBookLocker {
   static i18n: any;
@@ -184,10 +185,6 @@ export class NoteBookLocker {
     });
   }
 
-  static async 打开页签菜单(event: CustomEvent<IMenuBaseDetail>) {
-    console.log("🚀 ~ NoteBookLocker ~ event:", event);
-  }
-
   static async onWSMain(event: CustomEvent<IWebSocketData>) {
     if (event.detail?.data?.box) {
       if (event.detail?.data?.existed === false) return;
@@ -209,6 +206,7 @@ export class NoteBookLocker {
       {
         style: {
           backdropFilter: "blur(15px)",
+          zIndex: 拦截蒙层zIndex,
         },
       },
       {

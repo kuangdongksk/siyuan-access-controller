@@ -265,7 +265,8 @@ export class NoteBookLocker {
         .first()
         .data("nodeId")
     ).then(({ data }) => {
-      const 当前页签的笔记本id = data[0].box;
+      // BUG: 有时候会获取不到当前页签的笔记本id
+      const 当前页签的笔记本id = data?.box;
 
       const 所有页签 = [];
       所有打开的页签.each((_index, 页签) => {

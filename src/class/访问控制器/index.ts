@@ -234,7 +234,7 @@ export class NoteBookLocker {
   private static async 遍历笔记页签并上锁() {
     const 所有打开的页签 = $("ul.layout-tab-bar").children("li[data-type]");
 
-    await sleep(200);
+    await sleep(300);
     await likeQuery(
       $(所见即所得选择器).children("[data-node-index]").first().data("nodeId")
     ).then(({ data }) => {

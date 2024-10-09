@@ -9,8 +9,7 @@ import { EDataKey, sleep } from "../..";
 import { likeQuery } from "../../API/SQL";
 import { removeRefIgnore, removeSearchIgnore } from "../../API/搜索忽略";
 import { IFormItemConfig } from "../../components/Form/FormItem";
-import { 拦截蒙层zIndex } from "../../constant/style";
-import { 拦截蒙层 } from "./components/拦截蒙层";
+import { T蒙层位置, 拦截蒙层 } from "./components/拦截蒙层";
 import { 表单对话框 } from "./components/表单对话框";
 
 const 当前编辑区选择器 = ".protyle:not(.fn__none)";
@@ -83,7 +82,7 @@ export class NoteBookLocker {
         iconHTML: "",
         label: this.i18n.锁定笔记,
         click: () => {
-          this.添加拦截蒙层($element.parent(), dataId);
+          this.添加拦截蒙层($element.parent(), dataId, "目录");
           this.锁定指定笔记本下的页签(dataId);
         },
       });
@@ -139,8 +138,8 @@ export class NoteBookLocker {
                 this.上锁的笔记[dataId] = password;
                 this.saveData(EDataKey.上锁的笔记, this.上锁的笔记);
 
-                this.添加拦截蒙层($element.parent(), dataId);
-
+                this.添加拦截蒙层($element.parent(), dataId, "目录");
+                this.锁定指定笔记本下的页签(dataId);
                 对话框.destroy();
               }
             }
@@ -177,11 +176,13 @@ export class NoteBookLocker {
           if (this.已设置锁吗(dataId)) {
             this.添加拦截蒙层(
               $(".layout-tab-container").children(当前编辑区选择器),
-              dataId
+              dataId,
+              "内容区"
             );
             this.添加拦截蒙层(
-              $(".layout-tab-bar").children("li.item--focus"),
-              dataId
+              $(".layout-tab-bar").find("li.item--focus"),
+              dataId,
+              "页签"
             );
           }
         });
@@ -226,7 +227,7 @@ export class NoteBookLocker {
 
       if (!this.已设置锁吗(dataId)) return;
 
-      this.添加拦截蒙层($(notebook), dataId);
+      this.添加拦截蒙层($(notebook), dataId, "目录");
     });
   }
 
@@ -240,30 +241,38 @@ export class NoteBookLocker {
       // BUG: 有时候会获取不到当前页签的笔记本id
       const 当前页签的笔记本id = data?.[0]?.box;
 
-      const 所有页签 = [];
+      const 所有页签: {
+        根元素: Cash;
+        id: string;
+        蒙层位置: T蒙层位置;
+      }[] = [];
+
       所有打开的页签.each((_index, 页签) => {
         if ($(页签).hasClass("item--focus")) {
           所有页签.push({
             根元素: $(页签),
             id: 当前页签的笔记本id,
+            蒙层位置: "页签",
           });
           return;
         }
         所有页签.push({
           根元素: $(页签),
           id: $(页签).data("initdata")?.notebookId,
+          蒙层位置: "页签",
         });
       });
 
       所有页签.push({
         根元素: $(".layout-tab-container").children(".protyle"),
         id: 当前页签的笔记本id,
+        蒙层位置: "内容区",
       });
 
       所有页签.forEach((页签) => {
         if (this.已设置锁吗(页签.id)) {
-          const { 根元素, id } = 页签;
-          this.添加拦截蒙层(根元素, id);
+          const { 根元素, id, 蒙层位置 } = 页签;
+          this.添加拦截蒙层(根元素, id, 蒙层位置);
         }
       });
     });
@@ -272,34 +281,29 @@ export class NoteBookLocker {
   // 不锁定当前打开的文档
   private static 锁定指定笔记本下的页签(笔记本Id: string) {
     const 所有页签 = $("ul.layout-tab-bar").children("li[data-type]");
-    console.log("🚀 ~ NoteBookLocker ~ 所有页签:", 所有页签);
 
     所有页签.each((_index, 页签) => {
       const notebookId = $(页签).data("initdata")?.notebookId;
       if (笔记本Id !== notebookId) return;
 
-      this.添加拦截蒙层($(页签), notebookId);
+      this.添加拦截蒙层($(页签), notebookId, "页签");
     });
   }
 
-  private static 添加拦截蒙层(根元素: Cash, 当前笔记本Id: string) {
+  private static 添加拦截蒙层(
+    根元素: Cash,
+    当前笔记本Id: string,
+    蒙层位置: T蒙层位置
+  ) {
     if (根元素.hasClass("note-book-Locker-locked")) return;
 
     根元素.addClass("note-book-Locker-locked");
-    new 拦截蒙层(
-      $(根元素),
-      {
-        style: {
-          backdropFilter: "blur(15px)",
-          zIndex: 拦截蒙层zIndex,
-        },
-      },
-      {
-        i18n: this.i18n,
-        笔记数据: this.上锁的笔记,
-        当前id: 当前笔记本Id,
-      }
-    );
+    new 拦截蒙层($(根元素), {
+      i18n: this.i18n,
+      笔记数据: this.上锁的笔记,
+      当前id: 当前笔记本Id,
+      蒙层位置,
+    });
   }
 
   private static 已设置锁吗(notebookId: string) {

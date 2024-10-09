@@ -14,7 +14,7 @@ export class 蒙层 {
       data?: { [key: string]: any };
     }
   ) {
-    const { 事件列表, style } = option;
+    const { 事件列表, style } = option ?? {};
     this.父元素 = 父元素;
     this.父元素.css("position", "relative");
 

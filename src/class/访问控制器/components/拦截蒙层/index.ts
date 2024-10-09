@@ -2,6 +2,7 @@ import { Cash } from "cash-dom";
 import { IEventConfig } from "../../../../components/Form/FormItem";
 import { 蒙层 } from "../../../../components/蒙层";
 import { 表单对话框 } from "../表单对话框";
+import { addRefIgnore, addSearchIgnore, removeRefIgnore, removeSearchIgnore } from "../../../../API/搜索忽略";
 
 export class 拦截蒙层 extends 蒙层 {
   constructor(
@@ -44,6 +45,9 @@ export class 拦截蒙层 extends 蒙层 {
                         this.父元素.removeClass("note-book-Locker-locked");
                         对话框.destroy();
                         this.destroy();
+                        // 解除引用和搜索忽略
+                        removeRefIgnore(当前id);
+                        removeSearchIgnore(当前id);
                       } else {
                         表单.所有项[0].input.val("");
                         表单.所有项[0].tip.text(i18n.密码错误);
@@ -57,6 +61,10 @@ export class 拦截蒙层 extends 蒙层 {
         },
       },
     ];
+
+    // 添加引用和搜索忽略
+    addRefIgnore(当前id);
+    addSearchIgnore(当前id);
 
     this.事件列表.forEach((item) => {
       this.蒙层.on(item.event, item.handler);

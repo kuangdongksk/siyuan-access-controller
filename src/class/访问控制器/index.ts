@@ -6,12 +6,15 @@ import {
   IWebSocketData,
 } from "siyuan";
 import { EDataKey, sleep } from "../..";
+import { likeQuery } from "../../API/SQL";
+import {
+  removeRefIgnore,
+  removeSearchIgnore
+} from "../../API/搜索忽略";
 import { IFormItemConfig } from "../../components/Form/FormItem";
+import { 拦截蒙层zIndex } from "../../constant/style";
 import { 拦截蒙层 } from "./components/拦截蒙层";
 import { 表单对话框 } from "./components/表单对话框";
-import { fetchSyncPost } from "../../API/util";
-import { likeQuery } from "../../API/SQL";
-import { 拦截蒙层zIndex } from "../../constant/style";
 
 export class NoteBookLocker {
   static i18n: any;
@@ -199,9 +202,6 @@ export class NoteBookLocker {
   //#endregion 生命周期
 
   private static 添加拦截蒙层(根元素: Cash, 当前笔记本Id: string) {
-    // 添加引用和搜索忽略
-    addRefIgnore(当前笔记本Id);
-    addSearchIgnore(当前笔记本Id);
     if (根元素.hasClass("note-book-Locker-locked")) return;
 
     根元素.addClass("note-book-Locker-locked");
@@ -307,79 +307,4 @@ export class NoteBookLocker {
       this.添加拦截蒙层($(页签), notebookId);
     });
   }
-}
-
-// 添加忽略引用搜索
-async function addRefIgnore(noteId: string) {
-  const content = `\nbox != '${noteId}'`;
-  const path = "/data/.siyuan/refsearchignore";
-  let raw = await getFile(path);
-  if (raw.indexOf(content) !== -1) {
-    raw = raw.replace(content, "");
-  }
-  putFileContent(path, raw + content);
-}
-
-// 删除忽略引用搜索
-async function removeRefIgnore(noteId: string) {
-  const content = `\nbox != '${noteId}'`;
-  const path = "/data/.siyuan/refsearchignore";
-  let raw = await getFile(path);
-  if (raw.indexOf(content) !== -1) {
-    raw = raw.replace(content, "");
-  }
-  putFileContent(path, raw);
-}
-
-// 添加忽略搜索
-async function addSearchIgnore(noteId: string) {
-  const content = `\nbox != '${noteId}'`;
-  const path = "/data/.siyuan/searchignore";
-  let raw = await getFile(path);
-  if (raw.indexOf(content) !== -1) {
-    raw = raw.replace(content, "");
-  }
-  putFileContent(path, raw + content);
-}
-
-// 删除忽略搜索
-async function removeSearchIgnore(noteId: string) {
-  const content = `\nbox != '${noteId}'`;
-  const path = "/data/.siyuan/searchignore";
-  let raw = await getFile(path);
-  if (raw.indexOf(content) !== -1) {
-    raw = raw.replace(content, "");
-  }
-  putFileContent(path, raw);
-}
-
-// 读取文件
-async function getFile(storagePath: string) {
-  if (!storagePath) return "";
-  const data = await fetchSyncPost(
-    "/api/file/getFile",
-    { path: `${storagePath}` },
-    "text"
-  );
-  if (data.indexOf('"code":404') !== -1) return "";
-  return data;
-}
-
-// 写入文件内容
-async function putFileContent(path: string, content: any) {
-  const formData = new FormData();
-  formData.append("path", path);
-  formData.append("file", new Blob([content]));
-  return fetch("/api/file/putFile", {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to save file");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
 }

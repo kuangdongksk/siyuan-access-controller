@@ -5,6 +5,7 @@ const Form = { Wrap: FormWrap, Input: FormInput };
 
 export type TFieldsType =
   | "checkbox"
+  | "custom"
   | "textinput"
   | "password"
   | "textarea"

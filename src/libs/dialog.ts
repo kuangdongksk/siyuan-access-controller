@@ -12,19 +12,23 @@ export const inputDialog = (args: {
 }) => {
   const dialog = new Dialog({
     title: args.title,
-    content: `<div class="b3-dialog__content">
-    <div class="ft__breakword"><textarea class="b3-text-field fn__block" style="height: 100%;" placeholder=${
-      args?.placeholder ?? ""
-    }>${args?.defaultText ?? ""}</textarea></div>
-</div>
-<div class="b3-dialog__action">
-    <button class="b3-button b3-button--cancel">${
-      window.siyuan.languages.cancel
-    }</button><div class="fn__space"></div>
-    <button class="b3-button b3-button--text" id="confirmDialogConfirmBtn">${
-      window.siyuan.languages.confirm
-    }</button>
-</div>`,
+    content: `
+      <div class="b3-dialog__content">
+        <div class="ft__breakword">
+          <textarea class="b3-text-field fn__block" style="height: 100%;" placeholder=${
+            args?.placeholder ?? ""
+          }>${args?.defaultText ?? ""}
+          </textarea>
+        </div>
+      </div>
+      <div class="b3-dialog__action">
+          <button class="b3-button b3-button--cancel">${
+            window.siyuan.languages.cancel
+          }</button><div class="fn__space"></div>
+          <button class="b3-button b3-button--text" id="confirmDialogConfirmBtn">${
+            window.siyuan.languages.confirm
+          }</button>
+      </div>`,
     width: args.width ?? "520px",
     height: args.height,
   });
@@ -81,14 +85,15 @@ export const confirmDialog = (args: IConfirmDialogArgs) => {
 
   const dialog = new Dialog({
     title,
-    content: `<div class="b3-dialog__content">
-    <div class="ft__breakword">
+    content: `
+    <div class="b3-dialog__content">
+      <div class="ft__breakword">
+      </div>
     </div>
-</div>
-<div class="b3-dialog__action">
-    <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
-    <button class="b3-button b3-button--text" id="confirmDialogConfirmBtn">${window.siyuan.languages.confirm}</button>
-</div>`,
+    <div class="b3-dialog__action">
+      <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
+      <button class="b3-button b3-button--text" id="confirmDialogConfirmBtn">${window.siyuan.languages.confirm}</button>
+    </div>`,
     width: width,
     height: height,
   });
@@ -146,7 +151,9 @@ export const simpleDialog = (args: {
     height: args.height,
     destroyCallback: args.callback,
   });
+
   dialog.element.querySelector(".dialog-content").appendChild(args.ele);
+
   return {
     dialog,
     close: dialog.destroy.bind(dialog),
@@ -161,8 +168,11 @@ export const svelteDialog = (args: {
   callback?: () => void;
 }) => {
   let container = document.createElement("div");
+
   container.style.display = "contents";
+
   let component = args.constructor(container);
+
   const { dialog, close } = simpleDialog({
     ...args,
     ele: container,
@@ -171,6 +181,7 @@ export const svelteDialog = (args: {
       if (args.callback) args.callback();
     },
   });
+
   return {
     component,
     dialog,

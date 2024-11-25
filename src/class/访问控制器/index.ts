@@ -119,6 +119,7 @@ export class NoteBookLocker {
       iconHTML: "",
       label: "为笔记设置密码",
       click: () => {
+        // const 
         const { 表单, 对话框 } = 表单对话框("设置密码");
         const KeyDownEvent = {
           event: "keydown",

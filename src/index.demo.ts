@@ -1,4 +1,6 @@
+import HelloExample from "@/hello.svelte";
 import "@/index.scss";
+import SettingExample from "@/setting-example.svelte";
 import {
   adaptHotkey,
   confirm,
@@ -19,10 +21,6 @@ import {
   Protyle,
   showMessage,
 } from "siyuan";
-
-import HelloExample from "@/hello.svelte";
-import SettingExample from "@/setting-example.svelte";
-
 import { svelteDialog } from "./libs/dialog";
 import { SettingUtils } from "./libs/setting-utils";
 
@@ -429,12 +427,10 @@ export default class PluginVeil extends Plugin {
       content: `<div id="SettingPanel" style="height: 100%;"></div>`,
       width: "800px",
       destroyCallback: (options) => {
-        console.log("destroyCallback", options);
-        //You'd better destroy the component when the dialog is closed
-        pannel.$destroy();
+        se.$destroy();
       },
     });
-    let pannel = new SettingExample({
+    let se = new SettingExample({
       target: dialog.element.querySelector("#SettingPanel"),
     });
   }
@@ -462,20 +458,6 @@ export default class PluginVeil extends Plugin {
   }
 
   private showDialog() {
-    // let dialog = new Dialog({
-    //     title: `SiYuan ${Constants.SIYUAN_VERSION}`,
-    //     content: `<div id="helloPanel" class="b3-dialog__content"></div>`,
-    //     width: this.isMobile ? "92vw" : "720px",
-    //     destroyCallback() {
-    //         // hello.$destroy();
-    //     },
-    // });
-    // new HelloExample({
-    //     target: dialog.element.querySelector("#helloPanel"),
-    //     props: {
-    //         app: this.app,
-    //     }
-    // });
     svelteDialog({
       title: `SiYuan ${Constants.SIYUAN_VERSION}`,
       width: this.isMobile ? "92vw" : "720px",
@@ -574,18 +556,6 @@ export default class PluginVeil extends Plugin {
         },
       });
       menu.addItem({
-        icon: "iconLayout",
-        label: "Open Float Layer(open help first)",
-        click: () => {
-          this.addFloatLayer({
-            ids: ["20210428212840-8rqwn5o", "20201225220955-l154bn4"],
-            defIds: ["20230415111858-vgohvf3", "20200813131152-0wk5akh"],
-            x: window.innerWidth - 768 - 120,
-            y: 32,
-          });
-        },
-      });
-      menu.addItem({
         icon: "iconOpenWindow",
         label: "Open Doc Window(open help first)",
         click: () => {
@@ -626,19 +596,5 @@ export default class PluginVeil extends Plugin {
         this.openDIYSetting();
       },
     });
-    menu.addItem({
-      icon: "iconSparkles",
-      label: this.data[STORAGE_NAME].readonlyText || "Readonly",
-      type: "readonly",
-    });
-    if (this.isMobile) {
-      menu.fullscreen();
-    } else {
-      menu.open({
-        x: rect.right,
-        y: rect.bottom,
-        isLeft: true,
-      });
-    }
   }
 }

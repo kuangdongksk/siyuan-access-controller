@@ -1,44 +1,35 @@
 {
-  "name": "plugin-sample-vite-svelte",
-  "author": "frostime",
-  "url": "https://github.com/siyuan-note/plugin-sample-vite-svelte",
-  "version": "0.3.6",
-  "minAppVersion": "3.0.12",
-  "backends": [
-    "windows",
-    "linux",
-    "darwin",
-    "docker",
-    "ios",
-    "android"
-  ],
-  "frontends": [
-    "desktop",
-    "mobile",
-    "browser-desktop",
-    "browser-mobile",
-    "desktop-window"
-  ],
+  "name": "siyuan-access-controller",
+  "author": "kuangdongksk",
+  "url": "https://github.com/kuangdongksk/siyuan-access-controller.git",
+  "version": "0.0.9",
+  "minAppVersion": "3.0.17",
+  "backends": ["windows", "linux", "darwin", "ios", "android", "docker"],
+  "frontends": ["desktop", "browser-desktop", "desktop-window"],
   "displayName": {
-    "en_US": "Plugin sample with vite and svelte",
-    "zh_CN": "插件样例 vite + svelte 版"
+    "default": "access-controller",
+    "zh_CN": "访问控制"
   },
   "description": {
-    "en_US": "SiYuan plugin sample with vite and svelte",
-    "zh_CN": "使用 vite 和 svelte 开发的思源插件样例"
+    "default": "This is a access-controller",
+    "zh_CN": "这是一个访问控制插件，纯前端实现"
   },
   "readme": {
-    "en_US": "README.md",
+    "default": "README.md",
     "zh_CN": "README_zh_CN.md"
   },
   "funding": {
-    "custom": [
-      ""
-    ]
+    "openCollective": "",
+    "patreon": "",
+    "github": "https://github.com/kuangdongksk",
+    "custom": ["https://ld246.com/sponsor"]
   },
   "keywords": [
-    "plugin",
-    "sample",
-    "插件样例"
+    "访问控制",
+    "密码",
+    "加密",
+    "access-controller",
+    "password",
+    "encryption"
   ]
 }

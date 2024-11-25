@@ -1,5 +1,6 @@
 <script lang="ts">
   import { showMessage } from "siyuan";
+  import { ISettingItem } from "./components/Form";
   import SettingPanel from "./libs/components/setting-panel.svelte";
 
   let groups: string[] = ["🌈 Group 1", "✨ Group 2"];

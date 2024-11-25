@@ -1,14 +1,6 @@
-<!--
- Copyright (c) 2023 by frostime All Rights Reserved.
- Author       : frostime
- Date         : 2023-07-01 19:23:50
- FilePath     : /src/libs/components/setting-panel.svelte
- LastEditTime : 2024-08-09 21:41:07
- Description  : 
--->
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import Form from "./Form";
+  import Form, { ISettingItem } from "../../components/Form";
 
   export let group: string;
   export let settingItems: ISettingItem[];

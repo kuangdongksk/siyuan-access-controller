@@ -16,8 +16,6 @@ const 当前编辑区选择器 = ".protyle:not(.fn__none)";
 const 所见即所得选择器 = ".protyle-wysiwyg.protyle-wysiwyg--attr";
 
 export class NoteBookLocker {
-  static i18n: any;
-
   // static 当前页签对应的笔记本id: string;
   static 密码框: IFormItemConfig;
   static 确认密码框: IFormItemConfig;
@@ -31,27 +29,25 @@ export class NoteBookLocker {
   //#region 生命周期
   static onLoad(
     getData: (key: EDataKey) => Promise<any>,
-    saveData: (key: EDataKey, value: any) => Promise<void>,
-    i18n: any
+    saveData: (key: EDataKey, value: any) => Promise<void>
   ) {
-    this.i18n = i18n;
     this.getData = getData;
     this.saveData = saveData;
 
     this.密码框 = {
       fieldName: "password",
       fieldType: "password",
-      label: i18n.密码,
-      tip: i18n.请输入密码,
-      placeholder: i18n.请输入密码,
+      label: "密码",
+      tip: "请输入密码",
+      placeholder: "请输入密码",
     };
 
     this.确认密码框 = {
       fieldName: "confirmPassword",
       fieldType: "password",
-      label: i18n.确认密码,
-      tip: i18n.请再次输入密码,
-      placeholder: i18n.请再次输入密码,
+      label: "确认密码",
+      tip: "请再次输入密码",
+      placeholder: "请再次输入密码",
     };
 
     this.getData(EDataKey.上锁的笔记).then((data: any) => {
@@ -80,7 +76,7 @@ export class NoteBookLocker {
     if (this.已设置锁吗(dataId)) {
       detail.menu.addItem({
         iconHTML: "",
-        label: this.i18n.锁定笔记,
+        label: "锁定笔记",
         click: () => {
           this.添加拦截蒙层($element.parent(), dataId, "目录");
           this.锁定指定笔记本下的页签(dataId);
@@ -89,9 +85,9 @@ export class NoteBookLocker {
 
       detail.menu.addItem({
         iconHTML: "",
-        label: this.i18n.移除笔记密码,
+        label: "移除笔记密码",
         click: () => {
-          const { 表单, 对话框 } = 表单对话框(this.i18n.请输入密码);
+          const { 表单, 对话框 } = 表单对话框("请输入密码");
           表单.配置 = [
             {
               ...this.密码框,
@@ -121,9 +117,9 @@ export class NoteBookLocker {
 
     const 为笔记设置密码: IMenuItemOption = {
       iconHTML: "",
-      label: this.i18n.为笔记设置密码,
+      label: "为笔记设置密码",
       click: () => {
-        const { 表单, 对话框 } = 表单对话框(this.i18n.设置密码);
+        const { 表单, 对话框 } = 表单对话框("设置密码");
         const KeyDownEvent = {
           event: "keydown",
           handler: (e: KeyboardEvent) => {
@@ -133,7 +129,7 @@ export class NoteBookLocker {
 
               if (password !== confirmPassword) {
                 表单.所有项[1].input.val("");
-                表单.所有项[1].tip.text(this.i18n.两次输入密码不一致);
+                表单.所有项[1].tip.text("两次输入密码不一致");
               } else {
                 this.上锁的笔记[dataId] = password;
                 this.saveData(EDataKey.上锁的笔记, this.上锁的笔记);
@@ -168,7 +164,7 @@ export class NoteBookLocker {
 
     detail.menu.addItem({
       iconHTML: "",
-      label: this.i18n.锁定笔记,
+      label: "锁定笔记",
       click: () => {
         likeQuery(当前编辑区的第一个笔记.data("nodeId")).then(({ data }) => {
           const dataId = data[0].box;
@@ -299,7 +295,6 @@ export class NoteBookLocker {
 
     根元素.addClass("note-book-Locker-locked");
     new 拦截蒙层($(根元素), {
-      i18n: this.i18n,
       笔记数据: this.上锁的笔记,
       当前id: 当前笔记本Id,
       蒙层位置,

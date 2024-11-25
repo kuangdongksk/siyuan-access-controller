@@ -18,13 +18,12 @@ export class 拦截蒙层 extends 蒙层 {
   constructor(
     父元素: Cash,
     访问控制数据: {
-      i18n: { [key: string]: string };
       笔记数据: { [key: string]: string };
       当前id: string;
       蒙层位置: T蒙层位置;
     }
   ) {
-    const { i18n, 笔记数据, 当前id, 蒙层位置 } = 访问控制数据;
+    const { 笔记数据, 当前id, 蒙层位置 } = 访问控制数据;
     super(父元素);
 
     this.Id = 当前id;
@@ -40,14 +39,14 @@ export class 拦截蒙层 extends 蒙层 {
 
     this.蒙层.on("click", (event) => {
       event.stopPropagation();
-      const { 表单, 对话框 } = 表单对话框(i18n.请输入密码);
+      const { 表单, 对话框 } = 表单对话框("请输入密码");
       表单.配置 = [
         {
           fieldName: "password",
           fieldType: "password",
-          label: i18n.密码,
-          tip: i18n.请输入密码,
-          placeholder: i18n.请输入密码,
+          label: "密码",
+          tip: "请输入密码",
+          placeholder: "请输入密码",
           eventList: [
             {
               event: "keydown",
@@ -63,7 +62,7 @@ export class 拦截蒙层 extends 蒙层 {
                     removeSearchIgnore(当前id);
                   } else {
                     表单.所有项[0].input.val("");
-                    表单.所有项[0].tip.text(i18n.密码错误);
+                    表单.所有项[0].tip.text("密码错误");
                   }
                 }
               },

@@ -1,11 +1,4 @@
-import {
-  getBackend,
-  getFrontend,
-  ICard,
-  ICardData,
-  IModel,
-  Plugin,
-} from "siyuan";
+import { Plugin } from "siyuan";
 import { NoteBookLocker } from "./class/访问控制器";
 import { OnLayoutReady, OnLoad } from "./event/lifeCycle";
 import "./index.scss";
@@ -15,18 +8,8 @@ export enum EDataKey {
 }
 
 export default class AccessControllerPlugin extends Plugin {
-  private customTab: () => IModel;
-  private 是移动端吗: boolean;
-
   //#region onLoad
   async onload() {
-    const 前端 = getFrontend();
-
-    this.是移动端吗 = 前端 === "mobile" || 前端 === "browser-mobile";
-    if (this.是移动端吗) {
-      return;
-    }
-
     this.data[EDataKey.上锁的笔记] = {};
 
     const getData = async (key: EDataKey) => {
@@ -48,16 +31,11 @@ export default class AccessControllerPlugin extends Plugin {
       }
     };
 
-    OnLoad(getData, saveData, this.i18n);
+    OnLoad(getData, saveData);
   }
   //#endregion
 
   async onLayoutReady() {
-    const 后端 = getBackend();
-    if (this.是移动端吗) {
-      return;
-    }
-
     OnLayoutReady();
 
     this.eventBus.on("open-menu-doctree", (event) =>
@@ -80,28 +58,6 @@ export default class AccessControllerPlugin extends Plugin {
 
   uninstall() {
     //
-  }
-
-  async updateCards(options: ICardData) {
-    options.cards.sort((a: ICard, b: ICard) => {
-      if (a.blockID < b.blockID) {
-        return -1;
-      }
-      if (a.blockID > b.blockID) {
-        return 1;
-      }
-      return 0;
-    });
-    return options;
-  }
-
-  private eventBusPaste(event: any) {
-    // 如果需异步处理请调用 preventDefault， 否则会进行默认处理
-    event.preventDefault();
-    // 如果使用了 preventDefault，必须调用 resolve，否则程序会卡死
-    event.detail.resolve({
-      textPlain: event.detail.textPlain.trim(),
-    });
   }
 }
 

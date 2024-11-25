@@ -8,7 +8,7 @@ import {
 import { EDataKey, sleep } from "../..";
 import { likeQuery } from "../../API/SQL";
 import { removeRefIgnore, removeSearchIgnore } from "../../API/搜索忽略";
-import { IFormItemConfig } from "../../components/Form/FormItem";
+import { IFormItemConfig } from "../../components/表单/FormItem";
 import { T蒙层位置, 拦截蒙层 } from "./components/拦截蒙层";
 import { 表单对话框 } from "./components/表单对话框";
 

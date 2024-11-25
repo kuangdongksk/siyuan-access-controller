@@ -1,5 +1,5 @@
 import $, { Cash } from "cash-dom";
-import { IEventConfig } from "../Form/FormItem";
+import { IEventConfig } from "../表单/FormItem";
 
 export class 蒙层 {
   父元素: Cash;

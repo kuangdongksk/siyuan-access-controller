@@ -1,6 +1,6 @@
 import { Dialog } from "siyuan";
 import $ from "cash-dom";
-import { Form } from "../../../../components/Form";
+import { Form } from "../../../../components/表单";
 
 function 创建对话框(标题: string) {
   const 对话框 = new Dialog({

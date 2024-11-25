@@ -19,7 +19,7 @@ export enum EDataKey {
 const 当前编辑区选择器 = ".protyle:not(.fn__none)";
 const 所见即所得选择器 = ".protyle-wysiwyg.protyle-wysiwyg--attr";
 
-export class NoteBookLocker {
+export class Veil {
   static i18n: any;
 
   // static 当前页签对应的笔记本id: string;

@@ -23,9 +23,6 @@ export default class AccessControllerPlugin extends Plugin {
     const 前端 = getFrontend();
 
     this.是移动端吗 = 前端 === "mobile" || 前端 === "browser-mobile";
-    if (this.是移动端吗) {
-      return;
-    }
 
     this.data[EDataKey.上锁的笔记] = {};
 
@@ -54,9 +51,6 @@ export default class AccessControllerPlugin extends Plugin {
 
   async onLayoutReady() {
     const 后端 = getBackend();
-    if (this.是移动端吗) {
-      return;
-    }
 
     OnLayoutReady();
 

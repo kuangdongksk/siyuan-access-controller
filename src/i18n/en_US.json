@@ -1,0 +1,23 @@
+{
+  "addTopBarIcon": "Add a top bar icon by plugin",
+  "cancel": "Cancel",
+  "save": "Save",
+  "byeMenu": "Bye, Menu!",
+  "helloPlugin": "Hello, Plugin!",
+  "byePlugin": "Bye, Plugin!",
+  "showDialog": "Show dialog",
+  "getTab": "Print out all opened custom tabs in the debugger",
+  "removedData": "Data deleted",
+  "confirmRemove": "Confirm to delete the data in ${name}?",
+  "insertEmoji": "Insert Emoji",
+  "removeSpace": "Remove Space",
+  "为笔记设置密码": "Set password for note",
+  "请输入密码": "Please enter password",
+  "请再次输入密码": "Please enter password again",
+  "两次输入的密码不一致": "The two passwords entered do not match",
+  "密码": "Password",
+  "密码错误": "Password error",
+  "确认密码": "Confirm password",
+  "锁定笔记": "Lock note",
+  "移除笔记密码": "Remove note password"
+}

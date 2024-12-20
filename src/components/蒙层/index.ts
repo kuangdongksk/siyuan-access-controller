@@ -22,6 +22,7 @@ export class 蒙层 {
 
     this.蒙层.css({
       backdropFilter: "blur(5px)",
+      filter: "blur(5px)",
       zIndex: "1",
       ...style,
       position: "absolute",

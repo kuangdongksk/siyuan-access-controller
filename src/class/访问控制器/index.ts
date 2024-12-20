@@ -216,15 +216,6 @@ export class NoteBookLocker {
     所有的笔记本.each(async (_index, notebook) => {
       const dataId = notebook.dataset.url;
 
-      // const notes = $("ul", notebook).children("li");
-
-      // notes.each((_index, note) => {
-      //   const dataId = $(note).data("nodeId");
-      //   if (!this.已设置锁吗(dataId)) return;
-
-      //   this.锁定笔记($(note), dataId);
-      // });
-
       if (!this.已设置锁吗(dataId)) return;
 
       this.添加拦截蒙层($(notebook), dataId, "目录");
@@ -234,11 +225,10 @@ export class NoteBookLocker {
   private static async 遍历笔记页签并上锁() {
     const 所有打开的页签 = $("ul.layout-tab-bar").children("li[data-type]");
 
-    await sleep(300);
+    await sleep(300); // 页面较多时可能仍有遗漏
     await likeQuery(
       $(所见即所得选择器).children("[data-node-index]").first().data("nodeId")
     ).then(({ data }) => {
-      // BUG: 有时候会获取不到当前页签的笔记本id
       const 当前页签的笔记本id = data?.[0]?.box;
 
       const 所有页签: {

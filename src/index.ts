@@ -6,6 +6,7 @@ import {
   IModel,
   Plugin,
 } from "siyuan";
+import { removeRefIgnore, removeSearchIgnore } from "./API/搜索忽略";
 import { NoteBookLocker } from "./class/访问控制器";
 import { OnLayoutReady, OnLoad } from "./event/lifeCycle";
 import "./index.scss";
@@ -69,11 +70,13 @@ export default class AccessControllerPlugin extends Plugin {
   }
 
   onunload() {
-    //
+    removeRefIgnore()
+    removeSearchIgnore()
   }
 
   uninstall() {
-    //
+    removeRefIgnore()
+    removeSearchIgnore()
   }
 
   async updateCards(options: ICardData) {

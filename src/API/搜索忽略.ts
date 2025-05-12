@@ -12,9 +12,15 @@ export async function addRefIgnore(noteId: string) {
 }
 
 // 删除忽略引用搜索
-export async function removeRefIgnore(noteId: string) {
-  const content = `\nbox != '${noteId}'`;
+export async function removeRefIgnore(noteId?: string) {
   const path = "/data/.siyuan/refsearchignore";
+  if (!noteId) {
+    putFileContent(path, '');
+    return
+  }
+
+  const content = `\nbox != '${noteId}'`;
+
   let raw = await getFile(path);
   if (raw.indexOf(content) !== -1) {
     raw = raw.replace(content, "");
@@ -26,6 +32,7 @@ export async function removeRefIgnore(noteId: string) {
 export async function addSearchIgnore(noteId: string) {
   const content = `\nbox != '${noteId}'`;
   const path = "/data/.siyuan/searchignore";
+
   let raw = await getFile(path);
   if (raw.indexOf(content) !== -1) {
     raw = raw.replace(content, "");
@@ -34,9 +41,14 @@ export async function addSearchIgnore(noteId: string) {
 }
 
 // 删除忽略搜索
-export async function removeSearchIgnore(noteId: string) {
-  const content = `\nbox != '${noteId}'`;
+export async function removeSearchIgnore(noteId?: string) {
   const path = "/data/.siyuan/searchignore";
+  if (!noteId) {
+    putFileContent(path, '');
+    return
+  }
+
+  const content = `\nbox != '${noteId}'`;
   let raw = await getFile(path);
   if (raw.indexOf(content) !== -1) {
     raw = raw.replace(content, "");

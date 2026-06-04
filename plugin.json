@@ -1,8 +1,8 @@
 {
   "name": "siyuan-access-controller",
   "author": "kuangdongksk",
-  "url": "https://github.com/kuangdongksk/siyuan-access-controller.git",
-  "version": "0.1.2",
+  "url": "https://github.com/kuangdongksk/siyuan-access-controller",
+  "version": "0.1.3",
   "minAppVersion": "3.0.17",
   "backends": ["windows", "linux", "darwin", "ios", "android", "docker"],
   "frontends": ["desktop", "browser-desktop", "desktop-window"],
